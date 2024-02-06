@@ -12,7 +12,8 @@ import (
 type Config struct {
 	HttpServer HttpServer
 	Cors       cors.Config
-	GRPC GrpcClient
+	GRPC       GrpcClient
+	DBOrm          DBOrm
 }
 
 type HttpServer struct {
@@ -27,6 +28,14 @@ type HttpServer struct {
 	LimitRequest            int `mapstructure:"LIMIT_REQUEST"`
 	LimitRequestPerSecond   int `mapstructure:"LIMIT_REQUEST_PER_SECOND"`
 	RequestTimeoutPerSecond int `mapstructure:"REQUEST_TIMEOUT_PER_SECOND"`
+}
+
+type DBOrm struct {
+	Host     string `mapstructure:"DB_HOST"`
+	Port     string `mapstructure:"DB_PORT"`
+	DBName   string `mapstructure:"DB_NAME"`
+	DBUser   string `mapstructure:"DB_USER"`
+	Password string `mapstructure:"DB_PASSWORD"`
 }
 
 type GrpcClient struct {
@@ -55,11 +64,9 @@ func InitConfig(path string) (config *Config, err error) {
 	}
 
 	err = viper.Unmarshal(&config.GRPC)
-	// err = viper.Unmarshal(&config.Logger)
+	err = viper.Unmarshal(&config.DBOrm)
 	err = viper.Unmarshal(&config.HttpServer)
 	config.Cors = GetCorsConfig()
-
-	fmt.Println(config.GRPC.UserServicePort)
 
 	return
 }
