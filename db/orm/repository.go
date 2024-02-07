@@ -1,4 +1,4 @@
-package dbOrm
+package orm
 
 import (
 	"context"
