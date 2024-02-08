@@ -35,7 +35,7 @@ type DBOrm struct {
 	Port     string `mapstructure:"DB_PORT"`
 	DBName   string `mapstructure:"DB_NAME"`
 	DBUser   string `mapstructure:"DB_USER"`
-	Password string `mapstructure:"DB_PASSWORD"`
+	Password string `mapstructure:"DB_PWD"`
 }
 
 type GrpcClient struct {
