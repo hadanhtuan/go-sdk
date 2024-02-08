@@ -11,7 +11,7 @@ import (
 func Connect(dbConfig config.DBOrm) *gorm.DB {
 
 	dsn := fmt.Sprintf(
-		"host=%s port=%s dbname=%s user=%s password=%s sslmode=disable",
+		"host=%s port=%s dbname=%s user=%s password=%s sslmode=disable TimeZone=Asia/Shanghai",
 		dbConfig.Host,
 		dbConfig.Port,
 		dbConfig.DBName,
