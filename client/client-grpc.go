@@ -1,9 +1,7 @@
 package client
 
 import (
-	"context"
 	"time"
-
 	grpc_retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -14,7 +12,7 @@ const (
 	backoffLinear = 100 * time.Millisecond
 )
 
-func NewGRPCClientServiceConn(ctx context.Context, target string) (*grpc.ClientConn, error) {
+func NewGRPCClientServiceConn(target string) (*grpc.ClientConn, error) {
 	opts := []grpc_retry.CallOption{
 		grpc_retry.WithBackoff(grpc_retry.BackoffLinear(backoffLinear)),
 		grpc_retry.WithCodes(codes.NotFound, codes.Aborted),
