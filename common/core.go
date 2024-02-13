@@ -1,17 +1,10 @@
 package common
+
 import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
-// Error custom error of sdk
-type Error struct {
-	Type    string
-	Message string
-	Data    interface{}
-}
 
-func (e *Error) Error() string {
-	return e.Type + " : " + e.Message
-}
+var BODY_PAYLOAD = "BODY_PAYLOAD"
 
 type BaseResponse struct {
 	state         protoimpl.MessageState
@@ -24,6 +17,7 @@ type BaseResponse struct {
 	ErrorCode string `protobuf:"bytes,4,opt,name=errorCode,proto3" json:"errorCode,omitempty"`
 	Total     int64  `protobuf:"varint,5,opt,name=total,proto3" json:"total,omitempty"`
 }
+
 // APIResponse This is  response object with JSON format
 type APIResponse struct {
 	Status    int32             `json:"status"`

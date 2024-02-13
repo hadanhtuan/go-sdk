@@ -2,7 +2,6 @@ package orm
 
 import (
 	"fmt"
-
 	"github.com/hadanhtuan/go-sdk/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

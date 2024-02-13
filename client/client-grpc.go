@@ -20,11 +20,8 @@ func NewGRPCClientServiceConn(ctx context.Context, target string) (*grpc.ClientC
 		grpc_retry.WithCodes(codes.NotFound, codes.Aborted),
 	}
 
-	clientGRPCConn, err := grpc.DialContext(
-		ctx,
+	clientGRPCConn, err := grpc.Dial(
 		target,
-		// grpc.WithUnaryInterceptor(traceutils.OpenTracingClientInterceptor(manager.GetTracer())),
-		// grpc.WithUnaryInterceptor(manager.GetInterceptor()),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithUnaryInterceptor(grpc_retry.UnaryClientInterceptor(opts...)),
 	)
