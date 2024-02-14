@@ -46,6 +46,7 @@ func (m *Instance) Create(entity interface{}) *common.APIResponse {
 }
 
 func (m *Instance) CreateMany(entity []interface{}) *common.APIResponse {
+	
 	// check table
 	if m.DB == nil {
 		return &common.APIResponse{
