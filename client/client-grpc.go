@@ -12,7 +12,7 @@ const (
 	backoffLinear = 100 * time.Millisecond
 )
 
-func NewGRPCClientServiceConn(target string) (*grpc.ClientConn, error) {
+func NewGRPCClientConn(target string) (*grpc.ClientConn, error) {
 	opts := []grpc_retry.CallOption{
 		grpc_retry.WithBackoff(grpc_retry.BackoffLinear(backoffLinear)),
 		grpc_retry.WithCodes(codes.NotFound, codes.Aborted),
