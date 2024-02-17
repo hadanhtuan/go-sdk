@@ -2,6 +2,8 @@ package orm
 
 import (
 	"context"
+	"encoding/json"
+	"reflect"
 
 	"github.com/hadanhtuan/go-sdk/common"
 	"gorm.io/gorm"
@@ -23,6 +25,62 @@ func (m *Instance) ApplyDatabase(database *gorm.DB) *Instance {
 	return m
 }
 
+// TODO: return same type with m.Model
+func (m *Instance) newObject() interface{} {
+	t := reflect.TypeOf(m.Model)
+	return reflect.New(t).Interface()
+}
+
+func (m *Instance) newListObject(limit int) interface{} {
+	t := reflect.TypeOf(m.Model)
+	return reflect.MakeSlice(reflect.SliceOf(t), 0, limit).Interface()
+}
+
+func (m *Instance) convertSingleData(data interface{}) (interface{}, error) {
+	obj := m.newObject()
+	listObj := m.newListObject(1)
+
+	encodeData, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+	
+	err = json.Unmarshal(encodeData, &obj)
+
+	if err != nil {
+		return nil, err
+	}
+
+	listValue := reflect.Append(reflect.ValueOf(listObj),
+	reflect.Indirect(reflect.ValueOf(obj)))
+
+	return listValue.Interface(), nil
+}
+
+
+func (m *Instance) convertMultiData(data []map[string]interface{}) (interface{}, error) {
+	listObj := m.newListObject(len(data))
+
+	for _, mapData := range data {
+        obj := m.newObject()
+
+        encodeData, err := json.Marshal(mapData)
+        if err != nil {
+            return nil, err
+        }
+
+        err = json.Unmarshal(encodeData, &obj)
+        if err != nil {
+            return nil, err
+        }
+
+        listObj = reflect.Append(reflect.ValueOf(listObj), reflect.Indirect(reflect.ValueOf(obj)))
+    }
+
+    return listObj, nil
+}
+
+
 func (m *Instance) Create(entity interface{}) *common.APIResponse {
 	// check table
 	if m.DB == nil {
@@ -31,7 +89,7 @@ func (m *Instance) Create(entity interface{}) *common.APIResponse {
 			Message: "DB error: Table " + m.TableName + " is not init.",
 		}
 	}
-	err := m.DB.WithContext(context.TODO()).Create(&entity).Error
+	err := m.DB.WithContext(context.TODO()).Create(entity).Error
 
 	if err != nil {
 		return &common.APIResponse{
@@ -40,12 +98,16 @@ func (m *Instance) Create(entity interface{}) *common.APIResponse {
 		}
 	}
 
+	data, _ := m.convertSingleData(entity)
+
 	return &common.APIResponse{
 		Status: common.APIStatus.Created,
+		Data:   data,
+		Total:  1,
 	}
 }
 
-func (m *Instance) CreateMany(entity []interface{}) *common.APIResponse {
+func (m *Instance) QueryOne(query interface{}) *common.APIResponse {
 	// check table
 	if m.DB == nil {
 		return &common.APIResponse{
@@ -54,63 +116,49 @@ func (m *Instance) CreateMany(entity []interface{}) *common.APIResponse {
 		}
 	}
 
-	err := m.DB.WithContext(context.TODO()).Create(&entity).Error
-	if err != nil {
-		return &common.APIResponse{
-			Status:  common.APIStatus.Created,
-			Message: "Cannot create item in table " + m.TableName + ". Error detail: " + err.Error(),
-		}
-	}
-
-	return &common.APIResponse{
-		Status: common.APIStatus.Created,
-	}
-}
-
-func (m *Instance) QueryOne(params interface{}) *common.APIResponse {
-
-	// check table
-	if m.DB == nil {
-		return &common.APIResponse{
-			Status:  common.APIStatus.BadRequest,
-			Message: "DB error: Table " + m.TableName + " is not init.",
-		}
-	}
-
-	var entity interface{}
-	err := m.DB.WithContext(context.TODO()).Where(&params).First(&entity).Error
+	entity := m.newObject()
+	err := m.DB.WithContext(context.TODO()).Where(query).First(entity).Error
 
 	if entity == nil || err != nil {
 		return &common.APIResponse{
 			Status:  common.APIStatus.NotFound,
 			Message: "Not found any matched. Error detail: " + err.Error(),
+			Total:   0,
 		}
 	}
+
+	data, _ := m.convertSingleData(entity)
+
 
 	return &common.APIResponse{
 		Status:  common.APIStatus.Ok,
-		Data:    []interface{}{entity},
+		Data:    data,
 		Message: "Query " + m.TableName + " successfully.",
+		Total:   1,
 	}
 }
 
-func (m *Instance) Query(params interface{}, offset int, limit int, sortFields interface{}) *common.APIResponse {
-	var entities []interface{}
-	var total int64
-
-	err := m.DB.WithContext(context.TODO()).Model(&entities).Where(&params).Count(&total).Error
-	if err != nil {
+func (m *Instance) Query(query interface{}, offset int, limit int) *common.APIResponse {
+	// check table
+	if m.DB == nil {
 		return &common.APIResponse{
 			Status:  common.APIStatus.BadRequest,
-			Message: "Cannot count item in table " + m.TableName + ". Error detail: " + err.Error(),
+			Message: "DB error: Table " + m.TableName + " is not init.",
 		}
 	}
-	err = m.DB.WithContext(context.TODO()).Offset((offset - 1) * limit).Limit(limit).Where(&params).Find(&entities).Error
+
+	entities := []map[string]interface{}{} // TODO: use for dynamic result
+	var total int64
+
+	err := m.DB.WithContext(context.TODO()).
+		Model(m.Model).Where(query).Count(&total).
+		Offset((offset - 1) * limit).Limit(limit).Where(query).
+		Find(&entities).Error
 
 	if err != nil {
 		return &common.APIResponse{
 			Status:  common.APIStatus.BadRequest,
-			Message: "Cannot find item in table " + m.TableName + ". Error detail: " + err.Error(),
+			Message: "Cannot find item in table " + ". Error detail: " + err.Error(),
 		}
 	}
 
@@ -118,12 +166,21 @@ func (m *Instance) Query(params interface{}, offset int, limit int, sortFields i
 		Status:  common.APIStatus.Ok,
 		Data:    entities,
 		Total:   total,
-		Message: "Query " + m.TableName + " successfully.",
+		Message: "Query " + " successfully.",
 	}
 }
 
-func (m *Instance) UpdateOne(entity interface{}) *common.APIResponse {
-	err := m.DB.WithContext(context.TODO()).Save(&entity).Error
+func (m *Instance) Update(query interface{}, payload interface{}) *common.APIResponse {
+	// check table
+	if m.DB == nil {
+		return &common.APIResponse{
+			Status:  common.APIStatus.BadRequest,
+			Message: "DB error: Table " + m.TableName + " is not init.",
+		}
+	}
+
+	err := m.DB.WithContext(context.TODO()).Model(m.Model).
+		Where(query).Updates(payload).Error
 
 	if err != nil {
 		return &common.APIResponse{
@@ -138,24 +195,17 @@ func (m *Instance) UpdateOne(entity interface{}) *common.APIResponse {
 	}
 }
 
-func (m *Instance) UpdateMany(entities []interface{}) *common.APIResponse {
-	err := m.DB.WithContext(context.TODO()).Save(&entities).Error
-
-	if err != nil {
+func (m *Instance) Delete(payload interface{}) *common.APIResponse {
+	// check table
+	if m.DB == nil {
 		return &common.APIResponse{
-			Status:  common.APIStatus.NotFound,
-			Message: "Cannot update. Error detail: " + err.Error(),
+			Status:  common.APIStatus.BadRequest,
+			Message: "DB error: Table " + m.TableName + " is not init.",
 		}
 	}
 
-	return &common.APIResponse{
-		Status:  common.APIStatus.Ok,
-		Message: "Item in table " + m.TableName + " updated.",
-	}
-}
-
-func (m *Instance) DeleteOne(entity interface{}) *common.APIResponse {
-	err := m.DB.WithContext(context.TODO()).Delete(&entity).Error
+	err := m.DB.WithContext(context.TODO()).
+		Where(payload).Delete(m.Model).Error
 
 	if err != nil {
 		return &common.APIResponse{
@@ -171,6 +221,14 @@ func (m *Instance) DeleteOne(entity interface{}) *common.APIResponse {
 }
 
 func (m *Instance) Count(params interface{}) *common.APIResponse {
+	// check table
+	if m.DB == nil {
+		return &common.APIResponse{
+			Status:  common.APIStatus.BadRequest,
+			Message: "DB error: Table " + m.TableName + " is not init.",
+		}
+	}
+
 	var entity interface{}
 	var count int64
 	m.DB.WithContext(context.TODO()).Model(&entity).Where(&params).Count(&count)

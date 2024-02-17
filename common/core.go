@@ -14,7 +14,6 @@ type BaseResponse struct {
 	Status    int32  `protobuf:"varint,1,opt,name=status,proto3" json:"status,omitempty"`
 	Message   string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 	Data      string `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
-	ErrorCode string `protobuf:"bytes,4,opt,name=errorCode,proto3" json:"errorCode,omitempty"`
 	Total     int64  `protobuf:"varint,5,opt,name=total,proto3" json:"total,omitempty"`
 }
 
@@ -23,7 +22,6 @@ type APIResponse struct {
 	Status    int32             `json:"status"`
 	Data      interface{}       `json:"data,omitempty"`
 	Message   string            `json:"message"`
-	ErrorCode string            `json:"errorCode,omitempty"`
 	Total     int64             `json:"total,omitempty"`
 	Headers   map[string]string `json:"headers,omitempty"`
 }
