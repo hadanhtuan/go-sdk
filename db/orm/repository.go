@@ -44,7 +44,7 @@ func (m *Instance) convertSingleData(data interface{}) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	err = json.Unmarshal(encodeData, &obj)
 
 	if err != nil {
@@ -52,34 +52,34 @@ func (m *Instance) convertSingleData(data interface{}) (interface{}, error) {
 	}
 
 	listValue := reflect.Append(reflect.ValueOf(listObj),
-	reflect.Indirect(reflect.ValueOf(obj)))
+		reflect.Indirect(reflect.ValueOf(obj)))
 
 	return listValue.Interface(), nil
 }
 
-
 func (m *Instance) convertMultiData(data []map[string]interface{}) (interface{}, error) {
 	listObj := m.newListObject(len(data))
-
+	var listValue reflect.Value = reflect.ValueOf(listObj)
+	// TODO: Don't need call Elem() in here: listValue = listValue.Elem()
 	for _, mapData := range data {
-        obj := m.newObject()
+		obj := m.newObject()
 
-        encodeData, err := json.Marshal(mapData)
-        if err != nil {
-            return nil, err
-        }
+		encodeData, err := json.Marshal(mapData)
+		if err != nil {
+			return nil, err
+		}
 
-        err = json.Unmarshal(encodeData, &obj)
-        if err != nil {
-            return nil, err
-        }
+		err = json.Unmarshal(encodeData, &obj)
+		if err != nil {
+			return nil, err
+		}
+		listValue = reflect.Append(listValue,
+			reflect.Indirect(reflect.ValueOf(obj)))
 
-        listObj = reflect.Append(reflect.ValueOf(listObj), reflect.Indirect(reflect.ValueOf(obj)))
-    }
+	}
 
-    return listObj, nil
+	return listValue.Interface(), nil
 }
-
 
 func (m *Instance) Create(entity interface{}) *common.APIResponse {
 	// check table
@@ -129,7 +129,6 @@ func (m *Instance) QueryOne(query interface{}) *common.APIResponse {
 
 	data, _ := m.convertSingleData(entity)
 
-
 	return &common.APIResponse{
 		Status:  common.APIStatus.Ok,
 		Data:    data,
@@ -162,9 +161,11 @@ func (m *Instance) Query(query interface{}, offset int, limit int) *common.APIRe
 		}
 	}
 
+	data, _ := m.convertMultiData(entities)
+
 	return &common.APIResponse{
 		Status:  common.APIStatus.Ok,
-		Data:    entities,
+		Data:    data,
 		Total:   total,
 		Message: "Query " + " successfully.",
 	}
