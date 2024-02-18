@@ -1,12 +1,6 @@
 package common
 
-import (
-	"encoding/json"
-	"github.com/hadanhtuan/go-sdk/common/proto"
-)
-
 var BODY_PAYLOAD = "BODY_PAYLOAD"
-
 
 // APIResponse This is  response object with JSON format
 type APIResponse struct {
@@ -39,27 +33,4 @@ var APIStatus = &StatusEnum{
 	NotFound:     404,
 	Timeout:      408,
 	ServerError:  500,
-}
-
-func ConvertResult(payload *sdkProto.BaseResponse) (result *APIResponse) {
-	var data interface{}
-
-	if payload == nil {
-		result.Message = "Internal Server Error"
-		result.Status = APIStatus.ServerError
-		return
-	}
-	err := json.Unmarshal([]byte(payload.Data), &data)
-
-	if err != nil {
-		result.Message = "Error marshall payload data. Error detail: " + err.Error()
-		result.Status = APIStatus.ServerError
-		return
-	}
-
-	result.Status = payload.Status
-	result.Message = payload.Message
-	result.Total = payload.Total
-	result.Data = data
-	return
 }
