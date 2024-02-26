@@ -1,4 +1,4 @@
-package pkg
+package sdk
 
 import (
 	"github.com/gin-gonic/gin"
