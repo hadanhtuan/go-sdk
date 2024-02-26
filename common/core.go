@@ -1,5 +1,10 @@
 package common
 
+import (
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
+)
+
 var BODY_PAYLOAD = "BODY_PAYLOAD"
 
 // APIResponse This is  response object with JSON format
@@ -9,6 +14,13 @@ type APIResponse struct {
 	Message string            `json:"message"`
 	Total   int64             `json:"total,omitempty"`
 	Headers map[string]string `json:"headers,omitempty"`
+}
+
+type JWTPayload struct {
+	ID       uuid.UUID `json:"id"`
+	Username string    `json:"username"`
+	Role     string    `json:"role"`
+	jwt.RegisteredClaims
 }
 
 // StatusEnum ...

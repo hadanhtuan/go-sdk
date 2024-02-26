@@ -13,7 +13,7 @@ type Config struct {
 	HttpServer HttpServer
 	Cors       cors.Config
 	GRPC       GrpcClient
-	DBOrm          DBOrm
+	DBOrm      DBOrm
 }
 
 type HttpServer struct {
@@ -46,6 +46,13 @@ type GrpcClient struct {
 	ChatServicePort string `mapstructure:"GRPC_CHAT_PORT"`
 }
 
+type AWSConfig struct {
+	Region string `mapstructure:"AWS_REGION"`
+	KMSKey string `mapstructure:"AWS_KMS_KEY"`
+}
+
+var AWS = &AWSConfig{}
+
 func InitConfig(path string) (config *Config, err error) {
 	config = new(Config)
 	wd, err := os.Getwd()
@@ -63,12 +70,32 @@ func InitConfig(path string) (config *Config, err error) {
 		return
 	}
 
-	err = viper.Unmarshal(&config.GRPC)
-	err = viper.Unmarshal(&config.DBOrm)
-	err = viper.Unmarshal(&config.HttpServer)
+	err = ParseENV(&config.GRPC)
+	if err != nil {
+		fmt.Printf("Error parsing grpc env. Error Detail %s", err.Error())
+		return
+	}
+	err = ParseENV(&config.DBOrm)
+	if err != nil {
+		fmt.Printf("Error parsing database env. Error Detail %s", err.Error())
+		return
+	}
+	err = ParseENV(&config.HttpServer)
+	if err != nil {
+		fmt.Printf("Error parsing grpc http. Error Detail %s", err.Error())
+		return
+	}
 	config.Cors = GetCorsConfig()
 
 	return
+}
+
+func ParseENV[T interface{}](object T) (error) {
+	err := viper.Unmarshal(object)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func GetCorsConfig() cors.Config {
