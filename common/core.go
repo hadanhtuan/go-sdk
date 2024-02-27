@@ -18,7 +18,8 @@ type APIResponse struct {
 
 type JWTPayload struct {
 	ID       uuid.UUID `json:"id"`
-	Email string    `json:"username"`
+	Email    string    `json:"username"`
+	DeviceID string    `json:"deviceId"`
 	Role     string    `json:"role"`
 	jwt.RegisteredClaims
 }
