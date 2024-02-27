@@ -44,6 +44,15 @@ type GrpcClient struct {
 
 	ChatServiceHost string `mapstructure:"GRPC_CHAT_HOST"`
 	ChatServicePort string `mapstructure:"GRPC_CHAT_PORT"`
+
+	BookingServiceHost string `mapstructure:"GRPC_BOOKING_HOST"`
+	BookingServicePort string `mapstructure:"GRPC_BOOKING_PORT"`
+
+	LocationServiceHost string `mapstructure:"GRPC_LOCATION_HOST"`
+	LocationServicePort string `mapstructure:"GRPC_LOCATION_PORT"`
+
+	PaymentServiceHost string `mapstructure:"GRPC_PAYMENT_HOST"`
+	PaymentServicePort string `mapstructure:"GRPC_PAYMENT_PORT"`
 }
 
 type AWSConfig struct {

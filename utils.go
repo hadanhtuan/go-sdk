@@ -1,6 +1,9 @@
 package sdk
 
 import (
+	"crypto/md5"
+	"encoding/hex"
+	"fmt"
 	"strconv"
 
 	"golang.org/x/crypto/bcrypt"
@@ -19,7 +22,6 @@ func ParseInt(text string, defaultValue int) int {
 	return num
 }
 
-
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
@@ -28,4 +30,12 @@ func HashPassword(password string) (string, error) {
 func VerifyPassword(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
+}
+
+func HashDevice(email, ipAddress, userAgent string) string {
+	hashKey := fmt.Sprintf("%s-%s-%s", email, userAgent, ipAddress)
+
+	hasher := md5.New()
+	hasher.Write([]byte(hashKey))
+	return hex.EncodeToString(hasher.Sum(nil))
 }
