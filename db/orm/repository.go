@@ -89,7 +89,7 @@ func (m *Instance) Create(entity interface{}) *common.APIResponse {
 			Message: "DB error: Table " + m.TableName + " is not init.",
 		}
 	}
-	err := m.DB.WithContext(context.TODO()).Create(entity).Error
+	err := m.DB.WithContext(context.TODO()).Table(m.TableName).Create(entity).Error
 
 	if err != nil {
 		return &common.APIResponse{
@@ -117,7 +117,7 @@ func (m *Instance) QueryOne(query interface{}) *common.APIResponse {
 	}
 
 	entity := m.newObject()
-	err := m.DB.WithContext(context.TODO()).Where(query).First(entity).Error
+	err := m.DB.WithContext(context.TODO()).Table(m.TableName).Where(query).First(entity).Error
 
 	if entity == nil || err != nil {
 		return &common.APIResponse{
@@ -149,7 +149,7 @@ func (m *Instance) Query(query interface{}, offset int, limit int) *common.APIRe
 	entities := []map[string]interface{}{} // TODO: use for dynamic result
 	var total int64
 
-	err := m.DB.WithContext(context.TODO()).
+	err := m.DB.WithContext(context.TODO()).Table(m.TableName).
 		Model(m.Model).Where(query).Count(&total).
 		Offset((offset - 1) * limit).Limit(limit).Where(query).
 		Find(&entities).Error
@@ -205,7 +205,7 @@ func (m *Instance) Delete(payload interface{}) *common.APIResponse {
 		}
 	}
 
-	err := m.DB.WithContext(context.TODO()).
+	err := m.DB.WithContext(context.TODO()).Table(m.TableName).
 		Where(payload).Delete(m.Model).Error
 
 	if err != nil {
