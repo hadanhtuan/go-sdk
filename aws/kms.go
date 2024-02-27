@@ -12,11 +12,11 @@ import (
 )
 
 // TODO: don't need to provide access key, when deploy to EC2 need to associate role
-func NewJWT(payload *common.JWTPayload) (string, error) {
+func NewJWT(payload *common.JWTPayload) (*common.JWTToken, error) {
 	awsCfg, err := config.LoadDefaultConfig(context.Background(),
 		config.WithRegion(aws.Region))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	expirationTime := time.Now().Add(5 * time.Minute)
@@ -30,10 +30,12 @@ func NewJWT(payload *common.JWTPayload) (string, error) {
 	str, err := jwtToken.SignedString(kmsConfig.WithContext(context.Background()))
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return str, nil
+	return &common.JWTToken{
+		Token: str,
+	}, nil
 
 }
 
@@ -44,7 +46,7 @@ func VerifyJWT(token string) (*common.JWTPayload, error) {
 		return nil, err
 	}
 
-	kmsConfig := jwtkms.NewKMSConfig(kms.NewFromConfig(awsCfg), aws.KMSKey, false) 
+	kmsConfig := jwtkms.NewKMSConfig(kms.NewFromConfig(awsCfg), aws.KMSKey, false)
 
 	payload := common.JWTPayload{}
 

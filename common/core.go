@@ -23,6 +23,10 @@ type JWTPayload struct {
 	jwt.RegisteredClaims
 }
 
+type JWTToken struct {
+	Token string `json:"token,omitempty"`
+}
+
 // StatusEnum ...
 type StatusEnum struct {
 	Ok           int32
