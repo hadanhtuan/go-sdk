@@ -1,17 +1,25 @@
 package aws
 
 import (
-	"github.com/hadanhtuan/go-sdk/config"
+	"context"
+
+	"github.com/aws/aws-sdk-go-v2/config"
+	awsConfig "github.com/aws/aws-sdk-go-v2/aws"
+	sdkConfig "github.com/hadanhtuan/go-sdk/config"
 )
 
-type AWSConfig struct {
+type AWSEnv struct {
 	Region string `mapstructure:"AWS_REGION"`
 	KMSKey string `mapstructure:"AWS_KMS_KEY"`
 }
 
-// TODO: Can only use aws ENV in local package, cannot export to outside
-var aws AWSConfig  
+// TODO: Global variable for internal package, cannot export to outside
+var awsEnv AWSEnv
+var awsCfg awsConfig.Config
 
 func ConnectAWS() {
-	config.ParseENV(&aws)
+	sdkConfig.ParseENV(&awsEnv)
+
+	awsCfg, _ = config.LoadDefaultConfig(context.Background(),
+		config.WithRegion(awsEnv.Region))
 }

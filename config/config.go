@@ -51,6 +51,9 @@ type GrpcClient struct {
 	LocationServiceHost string `mapstructure:"GRPC_LOCATION_HOST"`
 	LocationServicePort string `mapstructure:"GRPC_LOCATION_PORT"`
 
+	SearchServiceHost string `mapstructure:"GRPC_SEARCH_HOST"`
+	SearchServicePort string `mapstructure:"GRPC_SEARCH_PORT"`
+
 	PaymentServiceHost string `mapstructure:"GRPC_PAYMENT_HOST"`
 	PaymentServicePort string `mapstructure:"GRPC_PAYMENT_PORT"`
 }
