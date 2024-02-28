@@ -3,8 +3,8 @@ package aws
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/config"
 	awsConfig "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
 	sdkConfig "github.com/hadanhtuan/go-sdk/config"
 )
 
@@ -14,8 +14,10 @@ type AWSEnv struct {
 }
 
 // TODO: Global variable for internal package, cannot export to outside
-var awsEnv AWSEnv
-var awsCfg awsConfig.Config
+var (
+	awsEnv AWSEnv
+	awsCfg awsConfig.Config
+)
 
 func ConnectAWS() {
 	sdkConfig.ParseENV(&awsEnv)

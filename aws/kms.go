@@ -13,9 +13,9 @@ import (
 // TODO: don't need to provide access key, when deploy to EC2 need to associate role
 func NewJWT(payload *common.JWTPayload) (*common.JWTToken, error) {
 
-	expirationTime := time.Now().Add(3 * 24 * 60 * time.Minute)
+	expiresAt := time.Now().Add(3 * 24 * 60 * time.Minute)
 
-	payload.RegisteredClaims.ExpiresAt = jwt.NewNumericDate(expirationTime)
+	payload.RegisteredClaims.ExpiresAt = jwt.NewNumericDate(expiresAt)
 
 	jwtToken := jwt.NewWithClaims(jwtkms.SigningMethodECDSA256, payload)
 
@@ -29,6 +29,7 @@ func NewJWT(payload *common.JWTPayload) (*common.JWTToken, error) {
 
 	return &common.JWTToken{
 		Token: str,
+		ExpiresAt: expiresAt,
 	}, nil
 
 }
