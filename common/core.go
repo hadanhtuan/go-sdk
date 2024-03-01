@@ -19,10 +19,11 @@ type APIResponse struct {
 }
 
 type JWTPayload struct {
-	ID       uuid.UUID   `json:"id"`
-	Email    string      `json:"email"`
-	DeviceID string      `json:"deviceId"`
-	Role     interface{} `json:"role"`
+	ID         uuid.UUID   `json:"id"`
+	LoginLogID uuid.UUID   `json:"loginLogId"`
+	Email      string      `json:"email"`
+	DeviceID   string      `json:"deviceId"`
+	Role       interface{} `json:"role"`
 	jwt.RegisteredClaims
 }
 
