@@ -32,8 +32,8 @@ func VerifyPassword(password, hash string) bool {
 	return err == nil
 }
 
-func HashDevice(email, ipAddress, userAgent string) string {
-	hashKey := fmt.Sprintf("%s-%s-%s", email, userAgent, ipAddress)
+func HashDevice(ipAddress, userAgent string) string {
+	hashKey := fmt.Sprintf("%s-%s", userAgent, ipAddress)
 
 	hasher := md5.New()
 	hasher.Write([]byte(hashKey))
