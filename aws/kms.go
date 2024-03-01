@@ -13,9 +13,10 @@ import (
 // TODO: don't need to provide access key, when deploy to EC2 need to associate role
 func NewJWT(payload *common.JWTPayload) (*common.JWTToken, error) {
 
-	expiresAt := time.Now().Add(3 * 24 * time.Hour)
-
-	payload.RegisteredClaims.ExpiresAt = jwt.NewNumericDate(expiresAt)
+	if payload.RegisteredClaims.ExpiresAt == nil {
+		expiresAt := time.Now().Add(3 * 24 * time.Hour)
+		payload.RegisteredClaims.ExpiresAt = jwt.NewNumericDate(expiresAt)
+	}
 
 	jwtToken := jwt.NewWithClaims(jwtkms.SigningMethodECDSA256, payload)
 
@@ -29,7 +30,7 @@ func NewJWT(payload *common.JWTPayload) (*common.JWTToken, error) {
 
 	return &common.JWTToken{
 		Token:     str,
-		ExpiresAt: expiresAt,
+		ExpiresAt: payload.RegisteredClaims.ExpiresAt.Time,
 	}, nil
 
 }
