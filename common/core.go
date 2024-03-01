@@ -8,6 +8,7 @@ import (
 )
 
 var BODY_PAYLOAD = "BODY_PAYLOAD"
+var JWT_PAYLOAD = "JWT_PAYLOAD"
 
 // APIResponse This is  response object with JSON format
 type APIResponse struct {
