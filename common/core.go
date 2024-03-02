@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
 )
 
 var BODY_PAYLOAD = "BODY_PAYLOAD"
@@ -20,10 +19,9 @@ type APIResponse struct {
 }
 
 type JWTPayload struct {
-	UserID     uuid.UUID `json:"userId"`
-	LoginLogID uuid.UUID `json:"loginLogId"`
-	Email      string    `json:"email"`
-	DeviceID   string    `json:"deviceId"`
+	UserID     string `json:"userId"`
+	LoginLogID string `json:"loginLogId"`
+	DeviceID   string `json:"deviceId"`
 	jwt.RegisteredClaims
 }
 
