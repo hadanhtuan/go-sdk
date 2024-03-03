@@ -1,4 +1,4 @@
-package config
+package sdk
 
 import (
 	"fmt"
@@ -8,12 +8,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-// All config
+// ENV of HTTP, CORS, GRPC
 type Config struct {
 	HttpServer HttpServer
 	Cors       cors.Config
 	GRPC       GrpcClient
-	DBOrm      DBOrm
 }
 
 type HttpServer struct {
@@ -28,14 +27,6 @@ type HttpServer struct {
 	LimitRequest            int `mapstructure:"LIMIT_REQUEST"`
 	LimitRequestPerSecond   int `mapstructure:"LIMIT_REQUEST_PER_SECOND"`
 	RequestTimeoutPerSecond int `mapstructure:"REQUEST_TIMEOUT_PER_SECOND"`
-}
-
-type DBOrm struct {
-	Host     string `mapstructure:"DB_HOST"`
-	Port     string `mapstructure:"DB_PORT"`
-	DBName   string `mapstructure:"DB_NAME"`
-	DBUser   string `mapstructure:"DB_USER"`
-	Password string `mapstructure:"DB_PWD"`
 }
 
 type GrpcClient struct {
@@ -58,12 +49,26 @@ type GrpcClient struct {
 	PaymentServicePort string `mapstructure:"GRPC_PAYMENT_PORT"`
 }
 
-type AWSConfig struct {
+
+type ORMEnv struct {
+	Host     string `mapstructure:"DB_HOST"`
+	Port     string `mapstructure:"DB_PORT"`
+	DBName   string `mapstructure:"DB_NAME"`
+	DBUser   string `mapstructure:"DB_USER"`
+	Password string `mapstructure:"DB_PWD"`
+}
+
+type CacheEnv struct {
+	CacheHost string `mapstructure:"CACHE_HOST"`
+	CachePort string `mapstructure:"CACHE_PORT"`
+	CachePass string `mapstructure:"CACHE_PWD"`
+	CacheDB   int    `mapstructure:"CACHE_DB"`
+}
+
+type AWSEnv struct {
 	Region string `mapstructure:"AWS_REGION"`
 	KMSKey string `mapstructure:"AWS_KMS_KEY"`
 }
-
-var AWS = &AWSConfig{}
 
 func InitConfig(path string) (config *Config, err error) {
 	config = new(Config)
@@ -87,11 +92,6 @@ func InitConfig(path string) (config *Config, err error) {
 		fmt.Printf("Error parsing grpc env. Error Detail %s", err.Error())
 		return
 	}
-	err = ParseENV(&config.DBOrm)
-	if err != nil {
-		fmt.Printf("Error parsing database env. Error Detail %s", err.Error())
-		return
-	}
 	err = ParseENV(&config.HttpServer)
 	if err != nil {
 		fmt.Printf("Error parsing grpc http. Error Detail %s", err.Error())
@@ -102,7 +102,7 @@ func InitConfig(path string) (config *Config, err error) {
 	return
 }
 
-func ParseENV[T interface{}](object T) (error) {
+func ParseENV[T interface{}](object T) error {
 	err := viper.Unmarshal(object)
 	if err != nil {
 		return err

@@ -2,25 +2,34 @@ package orm
 
 import (
 	"fmt"
-	"github.com/hadanhtuan/go-sdk/config"
+	"log"
+
+	"github.com/hadanhtuan/go-sdk"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func Connect(dbConfig config.DBOrm) *gorm.DB {
+var (
+	dbEnv sdk.ORMEnv
+)
+
+func ConnectDB() *gorm.DB {
+	sdk.ParseENV(&dbEnv)
 
 	dsn := fmt.Sprintf(
 		"host=%s port=%s dbname=%s user=%s password=%s sslmode=disable TimeZone=Asia/Shanghai",
-		dbConfig.Host,
-		dbConfig.Port,
-		dbConfig.DBName,
-		dbConfig.DBUser,
-		dbConfig.Password,
+		dbEnv.Host,
+		dbEnv.Port,
+		dbEnv.DBName,
+		dbEnv.DBUser,
+		dbEnv.Password,
 	)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
+
+	log.Println("🗃️  Connected Successfully to the database")
 	return db
 }
