@@ -180,7 +180,7 @@ func (m *Instance) Update(query interface{}, payload interface{}) *common.APIRes
 		}
 	}
 
-	err := m.DB.WithContext(context.TODO()).Model(m.Model).
+	err := m.DB.WithContext(context.TODO()).Table(m.TableName).
 		Where(query).Updates(payload).Error
 
 	if err != nil {
@@ -230,9 +230,8 @@ func (m *Instance) Count(params interface{}) *common.APIResponse {
 		}
 	}
 
-	var entity interface{}
 	var count int64
-	m.DB.WithContext(context.TODO()).Model(&entity).Where(&params).Count(&count)
+	m.DB.WithContext(context.TODO()).Table(m.TableName).Where(&params).Count(&count)
 	return &common.APIResponse{
 		Status: common.APIStatus.Ok,
 		Total:  count,
