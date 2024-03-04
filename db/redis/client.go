@@ -11,28 +11,29 @@ import (
 )
 
 type CacheClient struct {
-	Client *redis.Client
+	Client   *redis.Client
+	CacheEnv sdk.CacheEnv
 }
 
 var (
-	Cache    *CacheClient
-	cacheEnv sdk.CacheEnv
+	Cache *CacheClient
 )
 
-func ConnectRedis() {
+func ConnectRedis() *CacheClient {
 	if Cache != nil {
-		return
+		return Cache
 	}
+	Cache = new(CacheClient)
 
-	sdk.ParseENV(&cacheEnv)
+	sdk.ParseENV(&Cache.CacheEnv)
 
 	_, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	client := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%s", cacheEnv.CacheHost, cacheEnv.CachePort),
-		Password: cacheEnv.CachePass,
-		DB:       cacheEnv.CacheDB,
+		Addr:     fmt.Sprintf("%s:%s", Cache.CacheEnv.CacheHost, Cache.CacheEnv.CachePort),
+		Password: Cache.CacheEnv.CachePass,
+		DB:       Cache.CacheEnv.CacheDB,
 	})
 
 	_, err := client.Ping(context.Background()).Result()
@@ -40,7 +41,7 @@ func ConnectRedis() {
 		log.Fatal(err)
 	}
 
-	Cache = new(CacheClient)
 	Cache.Client = client
-	log.Println("🗃️  Connected Successfully to the Redis")
+
+	return Cache
 }

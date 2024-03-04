@@ -6,7 +6,9 @@ import (
 	"time"
 )
 
-func (c *CacheClient) Set(key string, value any, ttl time.Duration) error {
+func Set(key string, value any, ttl time.Duration) error {
+	c := ConnectRedis() //TODO: this is singleton connection
+
 	valueByte, err := json.Marshal(value)
 
 	if err != nil {
@@ -18,7 +20,9 @@ func (c *CacheClient) Set(key string, value any, ttl time.Duration) error {
 	return nil
 }
 
-func (c *CacheClient) Get(key string, record any) error {
+func Get(key string, record any) error {
+	c := ConnectRedis() //TODO: this is singleton connection
+
 	b, err := c.Client.Get(context.Background(), key).Result()
 
 	if err != nil {
@@ -30,11 +34,13 @@ func (c *CacheClient) Get(key string, record any) error {
 	return err
 }
 
-func (c *CacheClient) Increase(key string, value int64) (bool, error) {
+func Increase(key string, value int64) (bool, error) {
+	c := ConnectRedis()
+
 	record, _ := c.Client.Get(context.Background(), key).Result()
 
 	if record == "" {
-		c.Set(key, 1, 0)
+		Set(key, 1, 0)
 		return true, nil
 	}
 
@@ -43,13 +49,17 @@ func (c *CacheClient) Increase(key string, value int64) (bool, error) {
 	return true, nil
 }
 
-func (c *CacheClient) Decrease(key string, value int64) (bool, error) {
+func Decrease(key string, value int64) (bool, error) {
+	c := ConnectRedis()
+
 	c.Client.DecrBy(context.Background(), key, value).Result()
 
 	return true, nil
 }
 
-func (c *CacheClient) Delete(keys []string) (bool, error) {
+func Delete(keys []string) (bool, error) {
+	c := ConnectRedis()
+
 	c.Client.Del(context.Background(), keys...).Result()
 
 	return true, nil
