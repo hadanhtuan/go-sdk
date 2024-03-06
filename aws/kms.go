@@ -7,12 +7,13 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/hadanhtuan/go-sdk/common"
+	sdkConfig "github.com/hadanhtuan/go-sdk/config"
 	"github.com/matelang/jwt-go-aws-kms/v2/jwtkms"
 )
 
 // TODO: don't need to provide access key, when deploy to EC2 need to associate role
 func NewJWT(payload *common.JWTPayload) (*common.JWTToken, error) {
-	AWS := ConnectAWS()
+	AWS := GetConnection()
 
 	if payload.RegisteredClaims.ExpiresAt == nil {
 		expiresAt := time.Now().Add(3 * 24 * time.Hour)
@@ -21,7 +22,7 @@ func NewJWT(payload *common.JWTPayload) (*common.JWTToken, error) {
 
 	jwtToken := jwt.NewWithClaims(jwtkms.SigningMethodECDSA256, payload)
 
-	kmsConfig := jwtkms.NewKMSConfig(kms.NewFromConfig(AWS.AwsCfg), AWS.AwsEnv.KMSKey, false) // TODO: false = not multi region
+	kmsConfig := jwtkms.NewKMSConfig(kms.NewFromConfig(AWS.AwsCfg), sdkConfig.AppConfig.AWS.KMSKey, false) // TODO: false = not multi region
 
 	str, err := jwtToken.SignedString(kmsConfig.WithContext(context.Background()))
 
@@ -37,9 +38,9 @@ func NewJWT(payload *common.JWTPayload) (*common.JWTToken, error) {
 }
 
 func VerifyJWT(token string) (*common.JWTPayload, error) {
-	AWS := ConnectAWS()
+	AWS := GetConnection()
 
-	kmsConfig := jwtkms.NewKMSConfig(kms.NewFromConfig(AWS.AwsCfg), AWS.AwsEnv.KMSKey, false)
+	kmsConfig := jwtkms.NewKMSConfig(kms.NewFromConfig(AWS.AwsCfg), sdkConfig.AppConfig.AWS.KMSKey, false)
 
 	payload := common.JWTPayload{}
 

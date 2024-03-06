@@ -6,13 +6,12 @@ import (
 	"log"
 	"time"
 
-	"github.com/hadanhtuan/go-sdk"
+	"github.com/hadanhtuan/go-sdk/config"
 	"github.com/redis/go-redis/v9"
 )
 
 type CacheClient struct {
-	Client   *redis.Client
-	CacheEnv sdk.CacheEnv
+	Client *redis.Client
 }
 
 var (
@@ -20,20 +19,15 @@ var (
 )
 
 func ConnectRedis() *CacheClient {
-	if Cache != nil {
-		return Cache
-	}
 	Cache = new(CacheClient)
-
-	sdk.ParseENV(&Cache.CacheEnv)
 
 	_, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	client := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%s", Cache.CacheEnv.CacheHost, Cache.CacheEnv.CachePort),
-		Password: Cache.CacheEnv.CachePass,
-		DB:       Cache.CacheEnv.CacheDB,
+		Addr:     fmt.Sprintf("%s:%s", config.AppConfig.Cache.CacheHost, config.AppConfig.Cache.CachePort),
+		Password: config.AppConfig.Cache.CachePass,
+		DB:       config.AppConfig.Cache.CacheDB,
 	})
 
 	_, err := client.Ping(context.Background()).Result()
@@ -44,4 +38,11 @@ func ConnectRedis() *CacheClient {
 	Cache.Client = client
 
 	return Cache
+}
+
+func GetConnection() *CacheClient {
+	if Cache != nil {
+		return Cache
+	}
+	return ConnectRedis()
 }
