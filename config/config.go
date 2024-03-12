@@ -16,11 +16,11 @@ type Config struct {
 	ORM        ORMEnv
 	Cache      CacheEnv
 	AWS        AWSEnv
-	Rabbit     RabbitEnv
+	AMQP       AMQPEnv
 	ES         ESEnv
 }
 
-//Global variable for using config in SDK
+// Global variable for using config in SDK
 var (
 	AppConfig *Config
 )
@@ -79,7 +79,7 @@ type AWSEnv struct {
 	KMSKey string `mapstructure:"AWS_KMS_KEY"`
 }
 
-type RabbitEnv struct {
+type AMQPEnv struct {
 	Host string `mapstructure:"RMQ_HOST"`
 	Port string `mapstructure:"RMQ_PORT"`
 	User string `mapstructure:"RMQ_USER"`
@@ -125,9 +125,9 @@ func InitConfig(path string) (config *Config, err error) {
 		fmt.Printf("Error parsing orm env. Error Detail %s", err.Error())
 		return
 	}
-	err = ParseENV(&config.Rabbit)
+	err = ParseENV(&config.AMQP)
 	if err != nil {
-		fmt.Printf("Error parsing rabbit env. Error Detail %s", err.Error())
+		fmt.Printf("Error parsing amqp env. Error Detail %s", err.Error())
 		return
 	}
 	err = ParseENV(&config.ES)
