@@ -80,10 +80,10 @@ type AWSEnv struct {
 }
 
 type AMQPEnv struct {
-	Host string `mapstructure:"RMQ_HOST"`
-	Port string `mapstructure:"RMQ_PORT"`
-	User string `mapstructure:"RMQ_USER"`
-	Pass string `mapstructure:"RMQ_PWD"`
+	Host string `mapstructure:"AMQP_HOST"`
+	Port string `mapstructure:"AMQP_PORT"`
+	User string `mapstructure:"AMQP_USER"`
+	Pass string `mapstructure:"AMQP_PWD"`
 }
 
 type ESEnv struct {
