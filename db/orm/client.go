@@ -25,6 +25,6 @@ func ConnectDB() *gorm.DB {
 		panic("failed to connect database")
 	}
 
-	log.Println("🗃️  Connected Successfully to the database")
+	log.Println("🚀 Connected Successfully to the database")
 	return db
 }

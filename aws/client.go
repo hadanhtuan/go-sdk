@@ -2,6 +2,7 @@ package aws
 
 import (
 	"context"
+	"log"
 
 	awsConfig "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -24,6 +25,8 @@ func ConnectAWS() *AWSClient {
 		config.WithRegion(sdkConfig.AppConfig.AWS.Region))
 
 	AWS.AwsCfg = awsCfg
+
+	log.Println("🚀 Connected Successfully to AWS")
 	return AWS
 }
 

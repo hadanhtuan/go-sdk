@@ -71,17 +71,17 @@ func ConnectRabbit(exchange, queue string, exchangeType ExchangeValue) *Rabbit {
 	if err != nil {
 		log.Fatal(err.Error())
 		return nil
-	} else {
-		log.Println("🚀 Connected Successfully to RabbitMQ")
 	}
 
 	AmqpClient = &Rabbit{
 		Connection:      conn,
-		ConsumerChannel: InitConsumerChannel(conn, exchange, queue, exchangeType),
+		ProducerChannel: InitProducerChannel(conn),
+		ConsumerChannel: InitConsumerChannel(conn, exchange, queue, exchangeType), //Service listen event on its exchange, other services send event to that exchange
 		Exchange:        exchange,
 		Queue:           queue,
 	}
 
+	log.Println("🚀 Connected Successfully to RabbitMQ")
 	return AmqpClient
 }
 
@@ -107,6 +107,16 @@ func InitConsumerChannel(connection *amqp.Connection, exchange, queue string, ex
 	go DeClareQueue(queue, channel, &wg)
 
 	wg.Wait()
+
+	return channel
+}
+
+func InitProducerChannel(connection *amqp.Connection) *amqp.Channel {
+	channel, err := connection.Channel()
+	if err != nil {
+		slog.Info(err.Error())
+		return nil
+	}
 
 	return channel
 }

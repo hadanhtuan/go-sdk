@@ -36,7 +36,8 @@ func ConnectRedis() *CacheClient {
 	}
 
 	Cache.Client = client
-
+	
+	log.Println("🚀 Connected Successfully to Redis")
 	return Cache
 }
 
