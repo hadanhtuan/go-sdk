@@ -137,7 +137,7 @@ func (m *Instance) QueryOne(query interface{}) *common.APIResponse {
 	}
 }
 
-func (m *Instance) Query(query interface{}, offset int, limit int) *common.APIResponse {
+func (m *Instance) Query(query interface{}, offset int32, limit int32) *common.APIResponse {
 	// check table
 	if m.DB == nil {
 		return &common.APIResponse{
@@ -151,7 +151,7 @@ func (m *Instance) Query(query interface{}, offset int, limit int) *common.APIRe
 
 	err := m.DB.WithContext(context.TODO()).Table(m.TableName).
 		Model(m.Model).Where(query).Count(&total).
-		Offset((offset - 1) * limit).Limit(limit).Where(query).
+		Offset(int((offset - 1) * limit)).Limit(int(limit)).Where(query).
 		Find(&entities).Error
 
 	if err != nil {

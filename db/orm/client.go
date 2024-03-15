@@ -4,25 +4,20 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hadanhtuan/go-sdk"
+	"github.com/hadanhtuan/go-sdk/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var (
-	dbEnv sdk.ORMEnv
-)
-
 func ConnectDB() *gorm.DB {
-	sdk.ParseENV(&dbEnv)
 
 	dsn := fmt.Sprintf(
 		"host=%s port=%s dbname=%s user=%s password=%s sslmode=disable TimeZone=Asia/Shanghai",
-		dbEnv.Host,
-		dbEnv.Port,
-		dbEnv.DBName,
-		dbEnv.DBUser,
-		dbEnv.Password,
+		config.AppConfig.ORM.Host,
+		config.AppConfig.ORM.Port,
+		config.AppConfig.ORM.DBName,
+		config.AppConfig.ORM.DBUser,
+		config.AppConfig.ORM.Password,
 	)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -30,6 +25,6 @@ func ConnectDB() *gorm.DB {
 		panic("failed to connect database")
 	}
 
-	log.Println("🗃️  Connected Successfully to the database")
+	log.Println("🚀 Connected Successfully to the database")
 	return db
 }

@@ -2,33 +2,37 @@ package aws
 
 import (
 	"context"
+	"log"
 
 	awsConfig "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	sdk "github.com/hadanhtuan/go-sdk"
+	sdkConfig "github.com/hadanhtuan/go-sdk/config"
 )
 
 type AWSClient struct {
 	AwsCfg awsConfig.Config
-	AwsEnv sdk.AWSEnv
 }
 
 // TODO: Global variable for internal package, cannot export to outside
 var (
-	aws *AWSClient
+	AWS *AWSClient
 )
 
 func ConnectAWS() *AWSClient {
-	if aws != nil {
-		return aws
-	}
-	aws = new(AWSClient)
-
-	sdk.ParseENV(&aws.AwsEnv)
+	AWS = new(AWSClient)
 
 	awsCfg, _ := config.LoadDefaultConfig(context.Background(),
-		config.WithRegion(aws.AwsEnv.Region))
+		config.WithRegion(sdkConfig.AppConfig.AWS.Region))
 
-	aws.AwsCfg = awsCfg
-	return aws
+	AWS.AwsCfg = awsCfg
+
+	log.Println("🚀 Connected Successfully to AWS")
+	return AWS
+}
+
+func GetConnection() *AWSClient {
+	if AWS != nil {
+		return AWS
+	}
+	return ConnectAWS()
 }

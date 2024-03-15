@@ -7,7 +7,7 @@ import (
 )
 
 func Set(key string, value any, ttl time.Duration) error {
-	c := ConnectRedis() //TODO: this is singleton connection
+	c := GetConnection() //TODO: this is singleton connection
 
 	valueByte, err := json.Marshal(value)
 
@@ -21,7 +21,7 @@ func Set(key string, value any, ttl time.Duration) error {
 }
 
 func Get(key string, record any) error {
-	c := ConnectRedis() //TODO: this is singleton connection
+	c := GetConnection() //TODO: this is singleton connection
 
 	b, err := c.Client.Get(context.Background(), key).Result()
 
@@ -35,7 +35,7 @@ func Get(key string, record any) error {
 }
 
 func Increase(key string, value int64) (bool, error) {
-	c := ConnectRedis()
+	c := GetConnection()
 
 	record, _ := c.Client.Get(context.Background(), key).Result()
 
@@ -50,7 +50,7 @@ func Increase(key string, value int64) (bool, error) {
 }
 
 func Decrease(key string, value int64) (bool, error) {
-	c := ConnectRedis()
+	c := GetConnection()
 
 	c.Client.DecrBy(context.Background(), key, value).Result()
 
@@ -58,7 +58,7 @@ func Decrease(key string, value int64) (bool, error) {
 }
 
 func Delete(keys []string) (bool, error) {
-	c := ConnectRedis()
+	c := GetConnection()
 
 	c.Client.Del(context.Background(), keys...).Result()
 

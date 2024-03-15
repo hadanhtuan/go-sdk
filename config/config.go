@@ -1,4 +1,4 @@
-package sdk
+package config
 
 import (
 	"fmt"
@@ -8,14 +8,24 @@ import (
 	"github.com/spf13/viper"
 )
 
-// ENV of HTTP, CORS, GRPC
+// ENV of http, cors, grpc, aws, postgresql, redis, elastic, rabbitmq
 type Config struct {
-	HttpServer HttpServer
+	HttpServer HttpEnv
 	Cors       cors.Config
 	GRPC       GrpcClient
+	ORM        ORMEnv
+	Cache      CacheEnv
+	AWS        AWSEnv
+	AMQP       AMQPEnv
+	ES         ESEnv
 }
 
-type HttpServer struct {
+// Global variable for using config in SDK
+var (
+	AppConfig *Config
+)
+
+type HttpEnv struct {
 	AppPort       string `mapstructure:"PORT"`
 	ENV           string `mapstructure:"ENV" json:"ENV"`
 	TrustedDomain string `mapstructure:"TRUSTED_DOMAIN"`
@@ -49,7 +59,6 @@ type GrpcClient struct {
 	PaymentServicePort string `mapstructure:"GRPC_PAYMENT_PORT"`
 }
 
-
 type ORMEnv struct {
 	Host     string `mapstructure:"DB_HOST"`
 	Port     string `mapstructure:"DB_PORT"`
@@ -68,6 +77,20 @@ type CacheEnv struct {
 type AWSEnv struct {
 	Region string `mapstructure:"AWS_REGION"`
 	KMSKey string `mapstructure:"AWS_KMS_KEY"`
+}
+
+type AMQPEnv struct {
+	Host string `mapstructure:"AMQP_HOST"`
+	Port string `mapstructure:"AMQP_PORT"`
+	User string `mapstructure:"AMQP_USER"`
+	Pass string `mapstructure:"AMQP_PWD"`
+}
+
+type ESEnv struct {
+	Host     string `mapstructure:"ES_HOST"`
+	Port     int    `mapstructure:"ES_PORT"`
+	Username string `mapstructure:"ES_USER"`
+	Password string `mapstructure:"ES_PWD"`
 }
 
 func InitConfig(path string) (config *Config, err error) {
@@ -92,12 +115,39 @@ func InitConfig(path string) (config *Config, err error) {
 		fmt.Printf("Error parsing grpc env. Error Detail %s", err.Error())
 		return
 	}
+	err = ParseENV(&config.Cache)
+	if err != nil {
+		fmt.Printf("Error parsing cache env. Error Detail %s", err.Error())
+		return
+	}
+	err = ParseENV(&config.ORM)
+	if err != nil {
+		fmt.Printf("Error parsing orm env. Error Detail %s", err.Error())
+		return
+	}
+	err = ParseENV(&config.AMQP)
+	if err != nil {
+		fmt.Printf("Error parsing amqp env. Error Detail %s", err.Error())
+		return
+	}
+	err = ParseENV(&config.ES)
+	if err != nil {
+		fmt.Printf("Error parsing elastic search http. Error Detail %s", err.Error())
+		return
+	}
+	err = ParseENV(&config.AWS)
+	if err != nil {
+		fmt.Printf("Error parsing aws env. Error Detail %s", err.Error())
+		return
+	}
 	err = ParseENV(&config.HttpServer)
 	if err != nil {
 		fmt.Printf("Error parsing grpc http. Error Detail %s", err.Error())
 		return
 	}
 	config.Cors = GetCorsConfig()
+
+	AppConfig = config
 
 	return
 }
@@ -108,28 +158,4 @@ func ParseENV[T interface{}](object T) error {
 		return err
 	}
 	return nil
-}
-
-func GetCorsConfig() cors.Config {
-	configCors := cors.DefaultConfig()
-	configCors.AllowAllOrigins = true
-	configCors.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
-	configCors.AllowHeaders = []string{
-		"Origin",
-		"Authorization",
-		"Access-Control-Allow-Origin",
-		"Access-Control-Allow-Headers",
-		"Content-Type",
-		"X-User-Agent",
-	}
-	configCors.ExposeHeaders = []string{
-		"Origin",
-		"Access-Control-Allow-Origin",
-		"Access-Control-Allow-Headers",
-		"Content-Type",
-		"X-User-Agent",
-	}
-	configCors.AllowCredentials = true
-
-	return configCors
 }
