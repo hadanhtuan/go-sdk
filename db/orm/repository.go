@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"reflect"
+	"strings"
 
 	"github.com/hadanhtuan/go-sdk/common"
 	"gorm.io/gorm"
@@ -16,6 +17,11 @@ type Instance struct {
 	Model     interface{}
 
 	DB *gorm.DB
+}
+
+type QueryOption struct {
+	Preload []string
+	Order   []string
 }
 
 // Apply database connection for each model
@@ -32,8 +38,12 @@ func (m *Instance) newObject() interface{} {
 }
 
 func (m *Instance) newListObject(limit int) interface{} {
-	t := reflect.TypeOf(m.Model)
-	return reflect.MakeSlice(reflect.SliceOf(t), 0, limit).Interface()
+	t := reflect.TypeOf(m.Model) // Get the element type of the slice
+	slice := reflect.MakeSlice(reflect.SliceOf(t), 0, limit)
+
+	slicePtr := reflect.New(slice.Type())
+
+	return slicePtr.Interface()
 }
 
 func (m *Instance) convertSingleData(data interface{}) (interface{}, error) {
@@ -53,30 +63,6 @@ func (m *Instance) convertSingleData(data interface{}) (interface{}, error) {
 
 	listValue := reflect.Append(reflect.ValueOf(listObj),
 		reflect.Indirect(reflect.ValueOf(obj)))
-
-	return listValue.Interface(), nil
-}
-
-func (m *Instance) convertMultiData(data []map[string]interface{}) (interface{}, error) {
-	listObj := m.newListObject(len(data))
-	var listValue reflect.Value = reflect.ValueOf(listObj)
-	// TODO: Don't need call Elem() in here: listValue = listValue.Elem()
-	for _, mapData := range data {
-		obj := m.newObject()
-
-		encodeData, err := json.Marshal(mapData)
-		if err != nil {
-			return nil, err
-		}
-
-		err = json.Unmarshal(encodeData, &obj)
-		if err != nil {
-			return nil, err
-		}
-		listValue = reflect.Append(listValue,
-			reflect.Indirect(reflect.ValueOf(obj)))
-
-	}
 
 	return listValue.Interface(), nil
 }
@@ -137,7 +123,7 @@ func (m *Instance) QueryOne(query interface{}) *common.APIResponse {
 	}
 }
 
-func (m *Instance) Query(query interface{}, offset int32, limit int32) *common.APIResponse {
+func (m *Instance) Query(query interface{}, offset int32, limit int32, option *QueryOption) *common.APIResponse {
 	// check table
 	if m.DB == nil {
 		return &common.APIResponse{
@@ -146,13 +132,27 @@ func (m *Instance) Query(query interface{}, offset int32, limit int32) *common.A
 		}
 	}
 
-	entities := []map[string]interface{}{} // TODO: use for dynamic result
+	entities := m.newListObject(int(limit))
 	var total int64
 
-	err := m.DB.WithContext(context.TODO()).Table(m.TableName).
-		Model(m.Model).Where(query).Count(&total).
-		Offset(int((offset - 1) * limit)).Limit(int(limit)).Where(query).
-		Find(&entities).Error
+	db := m.DB.WithContext(context.TODO()).Table(m.TableName).Model(m.Model)
+
+	if option != nil {
+		if option.Preload != nil {
+			for _, preload := range option.Preload {
+				db.Preload(preload)
+			}
+		}
+
+		if option.Order != nil {
+			orders := strings.Join(option.Order, ", ")
+			db.Order(orders)
+		}
+	}
+
+	err := db.Where(query).Count(&total). // count
+		Offset(int((offset - 1) * limit)).Limit(int(limit)). // paginate
+		Where(query).Find(entities).Error
 
 	if err != nil {
 		return &common.APIResponse{
@@ -161,13 +161,22 @@ func (m *Instance) Query(query interface{}, offset int32, limit int32) *common.A
 		}
 	}
 
-	data, _ := m.convertMultiData(entities)
+	var data interface{}
+	v := reflect.ValueOf(entities)
+
+	if v.Kind() == reflect.Ptr && !v.IsNil() {
+		v = v.Elem() // Dereference the pointer
+		// Now 'v' holds the value that the pointer points to
+		data = v.Interface()
+	} else {
+		data = nil
+	}
 
 	return &common.APIResponse{
 		Status:  common.APIStatus.Ok,
 		Data:    data,
 		Total:   total,
-		Message: "Query " + " successfully.",
+		Message: "Query " + m.TableName + " successfully.",
 	}
 }
 
