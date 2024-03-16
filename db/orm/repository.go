@@ -65,7 +65,7 @@ func (m *Instance) convertSingleData(data interface{}) (interface{}, error) {
 	listValue := reflect.Append(reflect.ValueOf(listObj),
 		reflect.Indirect(reflect.ValueOf(obj)))
 
-	return listValue, nil
+	return listValue.Interface(), nil
 }
 
 func (m *Instance) Create(entity interface{}) *common.APIResponse {
