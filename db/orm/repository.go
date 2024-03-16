@@ -94,7 +94,7 @@ func (m *Instance) Create(entity interface{}) *common.APIResponse {
 	}
 }
 
-func (m *Instance) QueryOne(query interface{}) *common.APIResponse {
+func (m *Instance) QueryOne(query interface{},  option *QueryOption) *common.APIResponse {
 	// check table
 	if m.DB == nil {
 		return &common.APIResponse{
@@ -104,7 +104,23 @@ func (m *Instance) QueryOne(query interface{}) *common.APIResponse {
 	}
 
 	entity := m.newObject()
-	err := m.DB.WithContext(context.TODO()).Table(m.TableName).Where(query).First(entity).Error
+
+	db := m.DB.WithContext(context.TODO()).Table(m.TableName).Model(m.Model)
+
+	if option != nil {
+		if option.Preload != nil {
+			for _, preload := range option.Preload {
+				db.Preload(preload)
+			}
+		}
+
+		if option.Order != nil {
+			orders := strings.Join(option.Order, ", ")
+			db.Order(orders)
+		}
+	}
+
+	err := db.Where(query).First(entity).Error
 
 	if entity == nil || err != nil {
 		return &common.APIResponse{
