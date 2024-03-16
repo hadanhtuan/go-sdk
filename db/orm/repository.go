@@ -48,7 +48,8 @@ func (m *Instance) newListObject(limit int) interface{} {
 
 func (m *Instance) convertSingleData(data interface{}) (interface{}, error) {
 	obj := m.newObject()
-	listObj := m.newListObject(1)
+	t := reflect.TypeOf(m.Model)
+	listObj := reflect.MakeSlice(reflect.SliceOf(t), 0, 1).Interface()
 
 	encodeData, err := json.Marshal(data)
 	if err != nil {
@@ -64,7 +65,7 @@ func (m *Instance) convertSingleData(data interface{}) (interface{}, error) {
 	listValue := reflect.Append(reflect.ValueOf(listObj),
 		reflect.Indirect(reflect.ValueOf(obj)))
 
-	return listValue.Interface(), nil
+	return listValue, nil
 }
 
 func (m *Instance) Create(entity interface{}) *common.APIResponse {
