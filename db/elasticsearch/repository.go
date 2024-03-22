@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/core/index"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/core/search"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/core/update"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/indices/create"
+	"github.com/hadanhtuan/go-sdk/common"
 )
 
 type SearchResponse[T any] struct {
@@ -38,7 +40,7 @@ func GetDocument[T any](indexKey, id string) (T, error) {
 	return record, nil
 }
 
-func Search[T any](indexKey string, query *search.Request) SearchResponse[T] {
+func Search[T any](indexKey string, query *search.Request) *common.APIResponse {
 	es := GetConnection() //TODO: this is singleton connection
 
 	var records []T
@@ -48,11 +50,10 @@ func Search[T any](indexKey string, query *search.Request) SearchResponse[T] {
 	res, err := es.Client.Search().Index(indexKey).Request(query).Do(context.Background())
 
 	if err != nil {
-		return SearchResponse[T]{
-			Documents: []T{},
-			Total:     0,
-			Highlight: map[string]string{},
-			Error:     err,
+		return &common.APIResponse{
+			Total:   0,
+			Message: "Error query index " + indexKey + ". Error detail: " + err.Error(),
+			Status:  common.APIStatus.BadRequest,
 		}
 	}
 
@@ -71,11 +72,12 @@ func Search[T any](indexKey string, query *search.Request) SearchResponse[T] {
 		records = append(records, record)
 	}
 
-	return SearchResponse[T]{
-		Documents: records,
-		Total:     total,
-		Highlight: highlight,
-		Error:     nil,
+	return &common.APIResponse{
+		Total:   total,
+		Message: "Query index " + indexKey + "successfully.",
+		Data:    records,
+		Status:  common.APIStatus.Ok,
+		Headers: highlight,
 	}
 }
 
@@ -135,14 +137,22 @@ func DeleteDocument(indexKey, id string) (bool, error) {
 	return true, nil
 }
 
-func GetOneDocument(indexKey string, query *search.Request) (*search.Response, error) {
+func GetOneDocument(indexKey string, query *search.Request) *common.APIResponse {
 	es := GetConnection()
 
 	res, err := es.Client.Search().Index(indexKey).Request(query).Do(context.Background())
 
 	if err != nil {
-		return nil, err
+		return &common.APIResponse{
+			Total:   0,
+			Message: "Error query one in index " + indexKey + ". Error detail: " + err.Error(),
+			Status:  common.APIStatus.BadRequest,
+		}
 	}
 
-	return res, nil
-}
+	return &common.APIResponse{
+		Total:   1,
+		Message: "Query one in index " + indexKey + "successfully.",
+		Data:    res,
+		Status:  common.APIStatus.Ok,
+	}}

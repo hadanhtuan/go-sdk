@@ -80,7 +80,7 @@ func (m *Instance) Create(entity interface{}) *common.APIResponse {
 
 	if err != nil {
 		return &common.APIResponse{
-			Status:  common.APIStatus.Created,
+			Status:  common.APIStatus.BadRequest,
 			Message: "Cannot create item in table " + m.TableName + ". Error detail: " + err.Error(),
 		}
 	}
