@@ -46,8 +46,8 @@ type GrpcClient struct {
 	ChatServiceHost string `mapstructure:"GRPC_CHAT_HOST"`
 	ChatServicePort string `mapstructure:"GRPC_CHAT_PORT"`
 
-	BookingServiceHost string `mapstructure:"GRPC_BOOKING_HOST"`
-	BookingServicePort string `mapstructure:"GRPC_BOOKING_PORT"`
+	PropertyServiceHost string `mapstructure:"GRPC_PROPERTY_HOST"`
+	PropertyServicePort string `mapstructure:"GRPC_PROPERTY_PORT"`
 
 	LocationServiceHost string `mapstructure:"GRPC_LOCATION_HOST"`
 	LocationServicePort string `mapstructure:"GRPC_LOCATION_PORT"`
