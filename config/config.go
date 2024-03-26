@@ -18,6 +18,7 @@ type Config struct {
 	AWS        AWSEnv
 	AMQP       AMQPEnv
 	ES         ESEnv
+	Stripe     StripeENV
 }
 
 // Global variable for using config in SDK
@@ -91,6 +92,11 @@ type ESEnv struct {
 	Port     int    `mapstructure:"ES_PORT"`
 	Username string `mapstructure:"ES_USER"`
 	Password string `mapstructure:"ES_PWD"`
+}
+
+type StripeENV struct {
+	PublishKey string `mapstructure:"STRIPE_PUBLISH_KEY"`
+	SecretKey  string `mapstructure:"STRIPE_SECRET_KEY"`
 }
 
 func InitConfig(path string) (config *Config, err error) {
