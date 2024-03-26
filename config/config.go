@@ -151,6 +151,11 @@ func InitConfig(path string) (config *Config, err error) {
 		fmt.Printf("Error parsing grpc http. Error Detail %s", err.Error())
 		return
 	}
+	err = ParseENV(&config.Stripe)
+	if err != nil {
+		fmt.Printf("Error parsing stripe env. Error Detail %s", err.Error())
+		return
+	}
 	config.Cors = GetCorsConfig()
 
 	AppConfig = config
