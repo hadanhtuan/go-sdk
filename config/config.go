@@ -95,8 +95,9 @@ type ESEnv struct {
 }
 
 type StripeENV struct {
-	PublishKey string `mapstructure:"STRIPE_PUBLISH_KEY"`
-	SecretKey  string `mapstructure:"STRIPE_SECRET_KEY"`
+	PublishKey     string `mapstructure:"STRIPE_PUBLISH_KEY"`
+	SecretKey      string `mapstructure:"STRIPE_SECRET_KEY"`
+	EndpointSecret string `mapstructure:"STRIPE_ENDPOINT_SECRET"`
 }
 
 func InitConfig(path string) (config *Config, err error) {
