@@ -256,7 +256,7 @@ func (m *Instance) Count(params interface{}) *common.APIResponse {
 		}
 	}
 
-	var count int64
+	var count int64 = 0
 	m.DB.WithContext(context.TODO()).Table(m.TableName).Where(params).Count(&count)
 	return &common.APIResponse{
 		Status: common.APIStatus.Ok,
