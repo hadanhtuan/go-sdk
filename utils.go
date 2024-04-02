@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -34,6 +35,15 @@ func VerifyPassword(password, hash string) bool {
 
 func HashDevice(ipAddress, userAgent string) string {
 	hashKey := fmt.Sprintf("%s-%s", userAgent, ipAddress)
+
+	hasher := md5.New()
+	hasher.Write([]byte(hashKey))
+	return hex.EncodeToString(hasher.Sum(nil))
+}
+
+func HashKey(slice []string) string {
+	// hashKey := fmt.Sprintf("%s-%s", userAgent, ipAddress)
+	hashKey := strings.Join(slice, "-")
 
 	hasher := md5.New()
 	hasher.Write([]byte(hashKey))

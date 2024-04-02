@@ -6,6 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/hadanhtuan/go-sdk"
 	"github.com/hadanhtuan/go-sdk/common"
 	sdkConfig "github.com/hadanhtuan/go-sdk/config"
 	"github.com/matelang/jwt-go-aws-kms/v2/jwtkms"
@@ -24,15 +25,19 @@ func NewJWT(payload *common.JWTPayload) (*common.JWTToken, error) {
 
 	kmsConfig := jwtkms.NewKMSConfig(kms.NewFromConfig(AWS.AwsCfg), sdkConfig.AppConfig.AWS.KMSKey, false) // TODO: false = not multi region
 
-	str, err := jwtToken.SignedString(kmsConfig.WithContext(context.Background()))
+	accessToken, err := jwtToken.SignedString(kmsConfig.WithContext(context.Background()))
+	refreshToken := sdk.HashKey([]string{accessToken})
 
 	if err != nil {
 		return nil, err
 	}
 
+	// Access token expires: 3 day. Refresh token expires: 1 day
 	return &common.JWTToken{
-		Token:     str,
-		ExpiresAt: payload.RegisteredClaims.ExpiresAt.Time,
+		AccessToken:      accessToken,
+		AccessExpiresAt:  payload.RegisteredClaims.ExpiresAt.Time.Unix(),
+		RefreshToken:     refreshToken,
+		RefreshExpiresAt: payload.RegisteredClaims.ExpiresAt.Time.Add(1 * 24 * time.Hour).Unix(),
 	}, nil
 
 }

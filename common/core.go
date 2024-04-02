@@ -1,8 +1,6 @@
 package common
 
 import (
-	"time"
-
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -26,8 +24,10 @@ type JWTPayload struct {
 }
 
 type JWTToken struct {
-	Token     string    `json:"token,omitempty"`
-	ExpiresAt time.Time `json:"expiresAt,omitempty"`
+	AccessToken      string `json:"accessToken,omitempty"`
+	AccessExpiresAt  int64  `json:"accessExpiresAt,omitempty"`
+	RefreshToken     string `json:"refreshToken,omitempty"`
+	RefreshExpiresAt int64  `json:"refreshExpiresAt,omitempty"`
 }
 
 // StatusEnum ...
