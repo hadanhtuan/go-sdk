@@ -94,7 +94,38 @@ func (m *Instance) Create(entity interface{}) *common.APIResponse {
 	}
 }
 
-func (m *Instance) QueryOne(query interface{},  option *QueryOption) *common.APIResponse {
+func (m *Instance) UpdateOrCreate(entity interface{}, where interface{}) *common.APIResponse {
+	// check table
+	if m.DB == nil {
+		return &common.APIResponse{
+			Status:  common.APIStatus.BadRequest,
+			Message: "DB error: Table " + m.TableName + " is not init.",
+		}
+	}
+	err := m.DB.WithContext(context.TODO()).Table(m.TableName).Create(entity).Error
+
+	// update only set name=nick
+	if m.DB.Model(m.Model).Where(where).Updates(entity).RowsAffected == 0 {
+		m.DB.Model(m.Model).Create(entity) 
+	}
+
+	if err != nil {
+		return &common.APIResponse{
+			Status:  common.APIStatus.BadRequest,
+			Message: "Cannot create item in table " + m.TableName + ". Error detail: " + err.Error(),
+		}
+	}
+
+	data, _ := m.convertSingleData(entity)
+
+	return &common.APIResponse{
+		Status: common.APIStatus.Created,
+		Data:   data,
+		Total:  1,
+	}
+}
+
+func (m *Instance) QueryOne(query interface{}, option *QueryOption) *common.APIResponse {
 	// check table
 	if m.DB == nil {
 		return &common.APIResponse{
@@ -168,8 +199,8 @@ func (m *Instance) Query(query interface{}, offset int32, limit int32, option *Q
 	}
 
 	err := db.Where(query).Count(&total). // count
-		Offset(int((offset - 1) * limit)).Limit(int(limit)). // paginate
-		Where(query).Find(entities).Error
+						Offset(int((offset - 1) * limit)).Limit(int(limit)). // paginate
+						Where(query).Find(entities).Error
 
 	if err != nil {
 		return &common.APIResponse{
