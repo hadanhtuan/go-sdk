@@ -2,8 +2,10 @@ package sdk
 
 import (
 	"crypto/md5"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+	"crypto/rand"
 	"strconv"
 	"strings"
 
@@ -48,4 +50,13 @@ func HashKey(slice []string) string {
 	hasher := md5.New()
 	hasher.Write([]byte(hashKey))
 	return hex.EncodeToString(hasher.Sum(nil))
+}
+
+func RandomString(length int) string {
+	b := make([]byte, length)
+	_, err := rand.Read(b)
+	if err != nil {
+		panic(err)
+	}
+	return base64.StdEncoding.EncodeToString(b)
 }
