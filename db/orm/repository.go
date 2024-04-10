@@ -21,6 +21,7 @@ type Instance struct {
 
 type QueryOption struct {
 	Preload []string
+	Join    []string
 	Order   []string
 }
 
@@ -106,7 +107,7 @@ func (m *Instance) UpdateOrCreate(entity interface{}, where interface{}) *common
 
 	// update only set name=nick
 	if m.DB.Model(m.Model).Where(where).Updates(entity).RowsAffected == 0 {
-		m.DB.Model(m.Model).Create(entity) 
+		m.DB.Model(m.Model).Create(entity)
 	}
 
 	if err != nil {
@@ -145,10 +146,17 @@ func (m *Instance) QueryOne(query interface{}, option *QueryOption) *common.APIR
 			}
 		}
 
+		if option.Join != nil {
+			for _, join := range option.Join {
+				db.Joins(join)
+			}
+		}
+
 		if option.Order != nil {
 			orders := strings.Join(option.Order, ", ")
 			db.Order(orders)
 		}
+
 	}
 
 	err := db.Where(query).First(entity).Error
@@ -189,6 +197,12 @@ func (m *Instance) Query(query interface{}, offset int32, limit int32, option *Q
 		if option.Preload != nil {
 			for _, preload := range option.Preload {
 				db.Preload(preload)
+			}
+		}
+
+		if option.Join != nil {
+			for _, join := range option.Join {
+				db.Joins(join)
 			}
 		}
 
