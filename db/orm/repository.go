@@ -21,7 +21,6 @@ type Instance struct {
 
 type QueryOption struct {
 	Preload []string
-	Join    []string
 	Order   []string
 }
 
@@ -146,12 +145,6 @@ func (m *Instance) QueryOne(query interface{}, option *QueryOption) *common.APIR
 			}
 		}
 
-		if option.Join != nil {
-			for _, join := range option.Join {
-				db.Joins(join)
-			}
-		}
-
 		if option.Order != nil {
 			orders := strings.Join(option.Order, ", ")
 			db.Order(orders)
@@ -197,12 +190,6 @@ func (m *Instance) Query(query interface{}, offset int32, limit int32, option *Q
 		if option.Preload != nil {
 			for _, preload := range option.Preload {
 				db.Preload(preload)
-			}
-		}
-
-		if option.Join != nil {
-			for _, join := range option.Join {
-				db.Joins(join)
 			}
 		}
 
