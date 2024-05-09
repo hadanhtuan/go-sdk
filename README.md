@@ -9,13 +9,13 @@ Use for both API Gateway and Servies in backend development.
 
 ## Features
 
-- GRPC Conection, Protobuf generate
-- Base repository for PostgreSQL
-- Base repository for Redis
-- Package for intergrate with AWS (KMS, S3, ...)
+- **GRPC** Conection, Protobuf generate
+- Base repository for **PostgreSQL**
+- Base repository for **Redis**
+- Package for intergrate with **AWS (KMS, S3, ...)**
 - Common struct type and util
-- RabbitMQ 
-- Elastic Search 
+- **RabbitMQ** 
+- **Elastic Search** 
 
 This SDK work best with microservices development that use grpc to communicate.
 For example implement, see this below repositories:
