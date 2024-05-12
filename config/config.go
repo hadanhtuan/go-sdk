@@ -102,12 +102,9 @@ type StripeENV struct {
 
 func InitConfig(path string) (config *Config, err error) {
 	config = new(Config)
-	wd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
 
-	configPath := fmt.Sprintf("%s%s/.env", wd, path)
+
+	configPath := fmt.Sprintf("%s/.env", path)
 	viper.SetConfigFile(configPath)
 	viper.SetConfigType("env")
 	viper.AutomaticEnv()
