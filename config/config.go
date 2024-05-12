@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/spf13/viper"
@@ -102,7 +101,6 @@ type StripeENV struct {
 
 func InitConfig(path string) (config *Config, err error) {
 	config = new(Config)
-
 
 	configPath := fmt.Sprintf("%s/.env", path)
 	viper.SetConfigFile(configPath)
