@@ -18,9 +18,6 @@ Use for both API Gateway and Servies in backend development.
 - **Elastic Search** 
 
 This SDK work best with microservices development that use grpc to communicate.
-For example implement, see this below repositories:
-- [API Gateway](https://github.com/hadanhtuan/dorm-go-gateway)
-- [Services](https://github.com/hadanhtuan/dorm-go-services)
 
 ## Tech
 
