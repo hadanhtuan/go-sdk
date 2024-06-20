@@ -7,7 +7,7 @@ import (
 func GetCorsConfig() cors.Config {
 	configCors := cors.DefaultConfig()
 	configCors.AllowAllOrigins = true
-	configCors.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
+	configCors.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "PATCH"}
 	configCors.AllowHeaders = []string{
 		"Origin",
 		"Authorization",
