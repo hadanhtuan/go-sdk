@@ -1,20 +1,12 @@
 package sdk
 
 import (
-	"crypto/md5"
-	"crypto/rand"
-	"encoding/base64"
-	"encoding/hex"
 	"fmt"
 	"os"
 	"os/signal"
-	"strconv"
-	"strings"
 	"sync"
 	"syscall"
 	"time"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 type Task = func()
