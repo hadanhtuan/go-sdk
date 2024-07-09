@@ -43,6 +43,7 @@ func ConnectElasticSearch() *ESClient {
 	}
 
 	ES.Client = client
+	fmt.Println("[ 🚀 ] Connected Successfully to Elasticsearch")
 
 	return ES
 }

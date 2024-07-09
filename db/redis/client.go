@@ -3,7 +3,6 @@ package redis
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/hadanhtuan/go-sdk/config"
@@ -32,12 +31,12 @@ func ConnectRedis() *CacheClient {
 
 	_, err := client.Ping(context.Background()).Result()
 	if err != nil {
-		log.Fatal(err)
+		panic("Failed to connect Redis")
 	}
 
 	Cache.Client = client
-	
-	log.Println("🚀 Connected Successfully to Redis")
+
+	fmt.Println("[ 🚀 ] Connected Successfully to Redis")
 	return Cache
 }
 

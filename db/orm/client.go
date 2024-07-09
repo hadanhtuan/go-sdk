@@ -2,7 +2,6 @@ package orm
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/hadanhtuan/go-sdk/config"
 	"gorm.io/driver/postgres"
@@ -25,6 +24,6 @@ func ConnectORM() *gorm.DB {
 		panic("failed to connect database")
 	}
 
-	log.Println("🚀 Connected Successfully to the database")
+	fmt.Println("[ 🚀 ] Connected Successfully to the database")
 	return db
 }

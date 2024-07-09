@@ -81,7 +81,7 @@ func ConnectRabbit(exchange, queue string, exchangeType ExchangeValue) *Rabbit {
 		Queue:           queue,
 	}
 
-	log.Println("🚀 Connected Successfully to RabbitMQ")
+	fmt.Println("[ 🚀 ] Connected Successfully to RabbitMQ")
 	return AmqpClient
 }
 

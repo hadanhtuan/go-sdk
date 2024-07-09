@@ -54,7 +54,6 @@ func (cron *CronJob) Execute() {
 func (app *App) RunAllCronJob() error {
 	var wg = sync.WaitGroup{}
 
-	// start workers
 	if len(app.CronJobList) > 0 {
 		for _, cr := range app.CronJobList {
 			wg.Add(1)
