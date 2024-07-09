@@ -1,4 +1,4 @@
-package redis
+package cache
 
 import (
 	"context"
@@ -31,7 +31,7 @@ func ConnectRedis() *CacheClient {
 
 	_, err := client.Ping(context.Background()).Result()
 	if err != nil {
-		panic("Failed to connect Redis")
+		panic(err)
 	}
 
 	Cache.Client = client
