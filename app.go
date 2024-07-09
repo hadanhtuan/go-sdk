@@ -6,7 +6,8 @@ import (
 )
 
 type App struct {
-	Router  *gin.Engine
-	Config  *config.Config
-	Handler map[string]interface{}
+	Router      *gin.Engine
+	Config      *config.Config
+	Handler     map[string]interface{}
+	CronJobList []*CronJob
 }
