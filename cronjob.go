@@ -1,10 +1,8 @@
 package sdk
 
 import (
-	"fmt"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 	"time"
 )
@@ -49,4 +47,3 @@ func (cron *CronJob) Execute() {
 	tick.Stop()
 	os.Exit(0)
 }
-

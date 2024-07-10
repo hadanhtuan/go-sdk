@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hadanhtuan/go-sdk/config"
-	"google.golang.org/grpc"
 )
 
 type App struct {
