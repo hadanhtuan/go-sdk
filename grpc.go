@@ -42,11 +42,13 @@ func NewGRPCClientConn(target string) (*grpc.ClientConn, error) {
 }
 
 // Start Start API server
-func NewGRPCServer(server *grpc.Server, host, port string) *GRPCServer {
+func (app *App) NewGRPCServer(server *grpc.Server, host, port string) *GRPCServer {
 	s := &GRPCServer{}
 	s.Host = host
 	s.Port = port
 	s.Server = server
+
+	app.GRPCServerList = append(app.GRPCServerList, s)
 	return s
 }
 
