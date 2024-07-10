@@ -17,7 +17,7 @@ type CronJob struct {
 	period int
 }
 
-func (app *App) SetupWorker() *CronJob {
+func (app *App) NewCronJob() *CronJob {
 	var cron = &CronJob{}
 	app.CronJobList = append(app.CronJobList, cron)
 	return cron

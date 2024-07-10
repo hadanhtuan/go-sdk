@@ -11,3 +11,4 @@ type App struct {
 	Handler     map[string]interface{}
 	CronJobList []*CronJob
 }
+// TODO: should add amqp, grpc connection, databases connection into App
