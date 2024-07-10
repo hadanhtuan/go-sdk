@@ -12,3 +12,5 @@ type App struct {
 	CronJobList []*CronJob
 }
 // TODO: should add amqp, grpc connection, databases connection into App
+
+// Create App.Start() func that run the app
