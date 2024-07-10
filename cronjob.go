@@ -50,18 +50,3 @@ func (cron *CronJob) Execute() {
 	os.Exit(0)
 }
 
-// Run all cronjobs
-func (app *App) RunAllCronJob() error {
-	var wg = sync.WaitGroup{}
-
-	if len(app.CronJobList) > 0 {
-		for _, cr := range app.CronJobList {
-			wg.Add(1)
-			go cr.Execute()
-		}
-		fmt.Println("[ 🚀 ] Cronjobs started.")
-	}
-	wg.Wait()
-
-	return nil
-}

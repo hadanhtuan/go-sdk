@@ -1,7 +1,12 @@
-package client
+package sdk
 
 import (
+	"fmt"
+	"log"
+	"net"
+	"sync"
 	"time"
+
 	grpc_retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -11,6 +16,12 @@ import (
 const (
 	backoffLinear = 100 * time.Millisecond
 )
+
+type GRPCServer struct {
+	Server *grpc.Server
+	Port   string
+	Host   string
+}
 
 func NewGRPCClientConn(target string) (*grpc.ClientConn, error) {
 	opts := []grpc_retry.CallOption{
@@ -28,4 +39,32 @@ func NewGRPCClientConn(target string) (*grpc.ClientConn, error) {
 	}
 
 	return clientGRPCConn, nil
+}
+
+// Start Start API server
+func (s *GRPCServer) NewGRPCServer(server *grpc.Server, host, port string) {
+	s.Host = host
+	s.Port = port
+	s.Server = server
+}
+
+// Start Start API server
+func (s *GRPCServer) Start(wg *sync.WaitGroup) {
+	url := fmt.Sprintf(
+		"%s:%s",
+		s.Host,
+		s.Port,
+	)
+	lis, err := net.Listen("tcp", url)
+
+	if err != nil {
+		log.Fatalf("Failed to listen for gRPC: %v", err)
+	}
+
+	err = s.Server.Serve(lis)
+	if err != nil {
+		panic(err)
+	}
+
+	wg.Done()
 }
