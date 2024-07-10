@@ -57,6 +57,8 @@ func (s *GRPCServer) Start(wg *sync.WaitGroup) {
 	)
 	lis, err := net.Listen("tcp", url)
 
+	fmt.Printf("[ GRPC Service ] started on %s", url)
+
 	if err != nil {
 		log.Fatalf("Failed to listen for gRPC: %v", err)
 	}
