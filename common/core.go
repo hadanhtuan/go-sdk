@@ -17,8 +17,8 @@ type APIResponse struct {
 }
 
 type JWTPayload struct {
-	UserID     string `json:"userId"`
-	DeviceID   string `json:"deviceId"`
+	UserID   string `json:"userId"`
+	DeviceID string `json:"deviceId"`
 	jwt.RegisteredClaims
 }
 
@@ -30,7 +30,7 @@ type JWTToken struct {
 }
 
 // StatusEnum ...
-type StatusEnum struct {
+type StatusEnt struct {
 	Ok           int32
 	Created      int32
 	BadRequest   int32
@@ -42,7 +42,7 @@ type StatusEnum struct {
 }
 
 // APIStatus Published enum
-var APIStatus = &StatusEnum{
+var APIStatus = &StatusEnt{
 	Ok:           200,
 	Created:      201,
 	BadRequest:   400,
@@ -51,4 +51,23 @@ var APIStatus = &StatusEnum{
 	NotFound:     404,
 	Timeout:      408,
 	ServerError:  500,
+}
+
+type HTTPMethodValue string
+
+type HTTPMethodEnt struct {
+	GET     HTTPMethodValue
+	POST    HTTPMethodValue
+	PUT     HTTPMethodValue
+	DELETE  HTTPMethodValue
+	OPTIONS HTTPMethodValue
+}
+
+// APIStatus Published enum
+var HTTPMethod = &HTTPMethodEnt{
+	GET:     "GET",
+	POST:    "POST",
+	PUT:     "PUT",
+	DELETE:  "DELETE",
+	OPTIONS: "OPTIONS",
 }

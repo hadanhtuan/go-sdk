@@ -3,12 +3,10 @@ package aws
 import (
 	"context"
 	"time"
-
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/hadanhtuan/go-sdk"
 	"github.com/hadanhtuan/go-sdk/common"
-	sdkConfig "github.com/hadanhtuan/go-sdk/config"
 	"github.com/matelang/jwt-go-aws-kms/v2/jwtkms"
 )
 
@@ -23,7 +21,7 @@ func NewJWT(payload *common.JWTPayload) (*common.JWTToken, error) {
 
 	jwtToken := jwt.NewWithClaims(jwtkms.SigningMethodECDSA256, payload)
 
-	kmsConfig := jwtkms.NewKMSConfig(kms.NewFromConfig(AWS.AwsCfg), sdkConfig.AppConfig.AWS.KMSKey, false) // TODO: false = not multi region
+	kmsConfig := jwtkms.NewKMSConfig(kms.NewFromConfig(AWS.AwsCfg), AWS.KMSKey, false) // TODO: false = not multi region
 
 	accessToken, err := jwtToken.SignedString(kmsConfig.WithContext(context.Background()))
 	refreshToken := sdk.HashKey([]string{accessToken})
@@ -45,7 +43,7 @@ func NewJWT(payload *common.JWTPayload) (*common.JWTToken, error) {
 func VerifyJWT(token string) (*common.JWTPayload, error) {
 	AWS := GetConnection()
 
-	kmsConfig := jwtkms.NewKMSConfig(kms.NewFromConfig(AWS.AwsCfg), sdkConfig.AppConfig.AWS.KMSKey, false)
+	kmsConfig := jwtkms.NewKMSConfig(kms.NewFromConfig(AWS.AwsCfg), AWS.KMSKey, false)
 
 	payload := common.JWTPayload{}
 

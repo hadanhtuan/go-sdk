@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"reflect"
 	"strings"
-
 	"github.com/hadanhtuan/go-sdk/common"
 	"gorm.io/gorm"
 )

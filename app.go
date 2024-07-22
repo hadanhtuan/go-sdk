@@ -3,28 +3,21 @@ package sdk
 import (
 	"fmt"
 	"sync"
-
-	"github.com/gin-gonic/gin"
-	"github.com/hadanhtuan/go-sdk/config"
 )
 
 type App struct {
-	Router         *gin.Engine
-	Config         *config.Config
-	Handler        map[string]interface{}
+	Name           string
 	CronJobList    []*CronJob
 	GRPCServerList []*GRPCServer
+	HTTPServerList []*HTTPServer
 }
 
-// TODO: should add amqp, grpc connection, databases connection into App
 
-// Create App.Start() func that run the app
-
-// Run all cronjobs
+// App func run cronjob, start grpc server, http server
 func (app *App) Start() error {
 	var wg = sync.WaitGroup{}
 
-	// start servers
+	// start GRPC servers
 	if len(app.GRPCServerList) > 0 {
 		for _, s := range app.GRPCServerList {
 			wg.Add(1)
@@ -33,6 +26,16 @@ func (app *App) Start() error {
 		fmt.Println("[ 🚀 ] GRPC Server started.")
 	}
 
+	// start HTTP servers
+	if len(app.HTTPServerList) > 0 {
+		for _, s := range app.HTTPServerList {
+			wg.Add(1)
+			go s.Start(&wg)
+		}
+		fmt.Println("[ 🚀 ] HTTP Server started.")
+	}
+
+	// start cronjob
 	if len(app.CronJobList) > 0 {
 		for _, cr := range app.CronJobList {
 			wg.Add(1)

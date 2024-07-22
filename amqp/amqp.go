@@ -7,8 +7,6 @@ import (
 	"log/slog"
 	"sync"
 	"time"
-
-	"github.com/hadanhtuan/go-sdk/config"
 	"github.com/spf13/viper"
 	"github.com/streadway/amqp"
 )
@@ -50,17 +48,17 @@ func ParseENV[T interface{}](object T) error {
 }
 
 // step 1
-func ConnectRabbit(exchange, queue string, exchangeType ExchangeValue) *Rabbit {
+func ConnectRabbit(username, password, host, port, exchange, queue string, exchangeType ExchangeValue) *Rabbit {
 	if AmqpClient != nil {
 		return AmqpClient
 	}
 
 	connectString := fmt.Sprintf(
 		"amqp://%s:%s@%s:%s",
-		config.AppConfig.AMQP.User,
-		config.AppConfig.AMQP.Pass,
-		config.AppConfig.AMQP.Host,
-		config.AppConfig.AMQP.Port,
+		username,
+		password,
+		host,
+		port,
 	)
 
 	cnf := amqp.Config{
@@ -227,22 +225,3 @@ func (r *Rabbit) ConsumeData(ctx context.Context, messages <-chan amqp.Delivery)
 		}
 	}
 }
-
-/*
-A producer is a user application that sends messages.
-A queue is a buffer that stores messages.
-A consumer is a user application that receives messages.
-
-producer send msg to exchange
-consumer bind exchange to queue and consume msg.
-
-
-
-
-Instead, the producer [can only send messages to an exchange]. An exchange is a very simple thing.
-On one side it receives messages from producers and the other side it pushes them to queues.
-The exchange must know exactly what to do with a message it receives. Should it be appended to a particular queue?
-Should it be appended to many queues? Or should it get discarded. The rules for that are defined by the exchange type.
-
-There are a few exchange types available: direct, topic, headers and fanout.
-*/

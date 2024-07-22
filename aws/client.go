@@ -3,26 +3,26 @@ package aws
 import (
 	"context"
 	"fmt"
-
 	awsConfig "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	sdkConfig "github.com/hadanhtuan/go-sdk/config"
 )
 
 type AWSClient struct {
 	AwsCfg awsConfig.Config
+	KMSKey string
 }
 
-// TODO: Global variable for internal package, cannot export to outside
 var (
 	AWS *AWSClient
 )
 
-func ConnectAWS() *AWSClient {
-	AWS = new(AWSClient)
+func ConnectAWS(region string, KMSKey string) *AWSClient {
+	AWS = &AWSClient{
+		KMSKey: KMSKey,
+	}
 
 	awsCfg, _ := config.LoadDefaultConfig(context.Background(),
-		config.WithRegion(sdkConfig.AppConfig.AWS.Region))
+		config.WithRegion(region))
 
 	AWS.AwsCfg = awsCfg
 
@@ -31,8 +31,8 @@ func ConnectAWS() *AWSClient {
 }
 
 func GetConnection() *AWSClient {
-	if AWS != nil {
-		return AWS
+	if AWS == nil {
+		panic("Cannot connect to AWS")
 	}
-	return ConnectAWS()
+	return AWS
 }
