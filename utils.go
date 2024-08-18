@@ -2,10 +2,10 @@ package sdk
 
 import (
 	"crypto/md5"
+	"crypto/rand"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	"crypto/rand"
 	"strconv"
 	"strings"
 
@@ -13,7 +13,7 @@ import (
 )
 
 // ParseInt convert string to int
-func ParseInt(text string, defaultValue int) int {
+func StringToInt(text string, defaultValue int) int {
 	if text == "" {
 		return defaultValue
 	}
