@@ -3,8 +3,8 @@ package cache
 import (
 	"context"
 	"fmt"
-	"time"
 	"github.com/redis/go-redis/v9"
+	"time"
 )
 
 type CacheClient struct {

@@ -41,7 +41,7 @@ func NewGRPCClientConn(target string) (*grpc.ClientConn, error) {
 	return clientGRPCConn, nil
 }
 
-// Start Start API server
+// New GRPC API server
 func (app *App) NewGRPCServer(server *grpc.Server, host, port string) *GRPCServer {
 	s := &GRPCServer{}
 	s.Host = host
@@ -52,7 +52,7 @@ func (app *App) NewGRPCServer(server *grpc.Server, host, port string) *GRPCServe
 	return s
 }
 
-// Start Start API server
+// Start GRPC API server
 func (s *GRPCServer) Start(wg *sync.WaitGroup) {
 	url := fmt.Sprintf(
 		"%s:%s",

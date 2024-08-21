@@ -3,10 +3,10 @@ package pg
 import (
 	"context"
 	"encoding/json"
-	"reflect"
-	"strings"
 	"github.com/hadanhtuan/go-sdk/common"
 	"gorm.io/gorm"
+	"reflect"
+	"strings"
 )
 
 // Each model will define an Instance
@@ -93,7 +93,7 @@ func (m *Instance) Create(entity interface{}) *common.APIResponse {
 	}
 }
 
-func (m *Instance) UpdateOrCreate(entity interface{}, where interface{}) *common.APIResponse {
+func (m *Instance) UpdateOrCreate(entity interface{}, query *gorm.DB) *common.APIResponse {
 	// check table
 	if m.DB == nil {
 		return &common.APIResponse{
@@ -101,11 +101,11 @@ func (m *Instance) UpdateOrCreate(entity interface{}, where interface{}) *common
 			Message: "DB error: Table " + m.TableName + " is not init.",
 		}
 	}
-	err := m.DB.WithContext(context.TODO()).Table(m.TableName).Create(entity).Error
+	db := query.Table(m.TableName)
+	err := db.Create(entity).Error
 
-	// update only set name=nick
-	if m.DB.Model(m.Model).Where(where).Updates(entity).RowsAffected == 0 {
-		m.DB.Model(m.Model).Create(entity)
+	if db.Updates(entity).RowsAffected == 0 {
+		db.Create(entity)
 	}
 
 	if err != nil {
@@ -124,7 +124,7 @@ func (m *Instance) UpdateOrCreate(entity interface{}, where interface{}) *common
 	}
 }
 
-func (m *Instance) QueryOne(query interface{}, option *QueryOption) *common.APIResponse {
+func (m *Instance) QueryOne(query *gorm.DB, option *QueryOption) *common.APIResponse {
 	// check table
 	if m.DB == nil {
 		return &common.APIResponse{
@@ -135,23 +135,23 @@ func (m *Instance) QueryOne(query interface{}, option *QueryOption) *common.APIR
 
 	entity := m.newObject()
 
-	db := m.DB.WithContext(context.TODO()).Table(m.TableName).Model(m.Model)
+	query.Table(m.TableName)
 
 	if option != nil {
 		if option.Preload != nil {
 			for _, preload := range option.Preload {
-				db.Preload(preload)
+				query.Preload(preload)
 			}
 		}
 
 		if option.Order != nil {
 			orders := strings.Join(option.Order, ", ")
-			db.Order(orders)
+			query.Order(orders)
 		}
 
 	}
 
-	err := db.Where(query).First(entity).Error
+	err := query.First(entity).Error
 
 	if entity == nil || err != nil {
 		return &common.APIResponse{
@@ -171,7 +171,7 @@ func (m *Instance) QueryOne(query interface{}, option *QueryOption) *common.APIR
 	}
 }
 
-func (m *Instance) Query(query interface{}, offset int32, limit int32, option *QueryOption) *common.APIResponse {
+func (m *Instance) Query(query *gorm.DB, offset int32, limit int32, option *QueryOption) *common.APIResponse {
 	// check table
 	if m.DB == nil {
 		return &common.APIResponse{
@@ -183,29 +183,29 @@ func (m *Instance) Query(query interface{}, offset int32, limit int32, option *Q
 	entities := m.newListObject(int(limit))
 	var total int64
 
-	db := m.DB.WithContext(context.TODO()).Table(m.TableName).Model(m.Model)
+	query.Table(m.TableName)
 
 	if option != nil {
 		if option.Preload != nil {
 			for _, preload := range option.Preload {
-				db.Preload(preload)
+				query.Preload(preload)
 			}
 		}
 
 		if option.Order != nil {
 			orders := strings.Join(option.Order, ", ")
-			db.Order(orders)
+			query.Order(orders)
 		}
 	}
 
-	err := db.Where(query).Count(&total). // count
-						Offset(int((offset - 1) * limit)).Limit(int(limit)). // paginate
-						Where(query).Find(entities).Error
+	err := query.Count(&total). // count
+					Offset(int((offset - 1) * limit)).Limit(int(limit)). // paginate
+					Where(query).Find(entities).Error
 
 	if err != nil {
 		return &common.APIResponse{
 			Status:  common.APIStatus.BadRequest,
-			Message: "Cannot find item in table " + ". Error detail: " + err.Error(),
+			Message: "Cannot find item in table " + m.TableName + ". Error detail: " + err.Error(),
 		}
 	}
 
@@ -228,7 +228,7 @@ func (m *Instance) Query(query interface{}, offset int32, limit int32, option *Q
 	}
 }
 
-func (m *Instance) Update(query interface{}, payload interface{}) *common.APIResponse {
+func (m *Instance) Update(query *gorm.DB, payload interface{}) *common.APIResponse {
 	// check table
 	if m.DB == nil {
 		return &common.APIResponse{
@@ -237,8 +237,7 @@ func (m *Instance) Update(query interface{}, payload interface{}) *common.APIRes
 		}
 	}
 
-	err := m.DB.WithContext(context.TODO()).Table(m.TableName).
-		Where(query).Updates(payload).Error
+	err := query.Table(m.TableName).Updates(payload).Error
 
 	if err != nil {
 		return &common.APIResponse{
@@ -253,7 +252,7 @@ func (m *Instance) Update(query interface{}, payload interface{}) *common.APIRes
 	}
 }
 
-func (m *Instance) Delete(payload interface{}) *common.APIResponse {
+func (m *Instance) Delete(query *gorm.DB) *common.APIResponse {
 	// check table
 	if m.DB == nil {
 		return &common.APIResponse{
@@ -262,8 +261,7 @@ func (m *Instance) Delete(payload interface{}) *common.APIResponse {
 		}
 	}
 
-	err := m.DB.WithContext(context.TODO()).Table(m.TableName).
-		Where(payload).Delete(m.Model).Error
+	err := query.Table(m.TableName).Delete(m.Model).Error
 
 	if err != nil {
 		return &common.APIResponse{
@@ -278,7 +276,7 @@ func (m *Instance) Delete(payload interface{}) *common.APIResponse {
 	}
 }
 
-func (m *Instance) Count(params interface{}) *common.APIResponse {
+func (m *Instance) Count(query *gorm.DB) *common.APIResponse {
 	// check table
 	if m.DB == nil {
 		return &common.APIResponse{
@@ -288,7 +286,7 @@ func (m *Instance) Count(params interface{}) *common.APIResponse {
 	}
 
 	var count int64 = 0
-	m.DB.WithContext(context.TODO()).Table(m.TableName).Where(params).Count(&count)
+	query.Table(m.TableName).Count(&count)
 	return &common.APIResponse{
 		Status: common.APIStatus.Ok,
 		Total:  count,

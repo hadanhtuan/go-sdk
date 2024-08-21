@@ -1,8 +1,8 @@
 package sdk
 
 import (
-	"strings"
 	"github.com/labstack/echo"
+	"strings"
 )
 
 type HTTPRequest struct {

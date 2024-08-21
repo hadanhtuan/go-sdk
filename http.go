@@ -2,9 +2,9 @@ package sdk
 
 import (
 	"fmt"
-	"sync"
 	"github.com/hadanhtuan/go-sdk/common"
 	"github.com/labstack/echo"
+	"sync"
 )
 
 type Handler = func(req *HTTPRequest, res *HTTPResponse) error

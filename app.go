@@ -12,7 +12,6 @@ type App struct {
 	HTTPServerList []*HTTPServer
 }
 
-
 // App func run cronjob, start grpc server, http server
 func (app *App) Start() error {
 	var wg = sync.WaitGroup{}

@@ -3,6 +3,7 @@ package cache
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"time"
 )
 
@@ -12,7 +13,7 @@ func Set(key string, value any, ttl time.Duration) error {
 	valueByte, err := json.Marshal(value)
 
 	if err != nil {
-		return err
+		return errors.New("Cannot set key. Error detail: " + err.Error())
 	}
 
 	c.Client.Set(context.Background(), key, valueByte, ttl)
@@ -26,7 +27,7 @@ func Get(key string, record any) error {
 	b, err := c.Client.Get(context.Background(), key).Result()
 
 	if err != nil {
-		return err
+		return errors.New("Cannot get key. Error detail: " + err.Error())
 	}
 
 	err = json.Unmarshal([]byte(b), &record)
@@ -49,18 +50,26 @@ func Increase(key string, value int64) (bool, error) {
 	return true, nil
 }
 
-func Decrease(key string, value int64) (bool, error) {
+func Decrease(key string, value int64) (int64, error) {
 	c := GetConnection()
 
-	c.Client.DecrBy(context.Background(), key, value).Result()
+	i, err := c.Client.DecrBy(context.Background(), key, value).Result()
 
-	return true, nil
+	if err != nil {
+		return 0, errors.New("Cannot increase key. Error detail: " + err.Error())
+	}
+
+	return i, nil
 }
 
-func Delete(keys []string) (bool, error) {
+func Delete(keys []string) (int64, error) {
 	c := GetConnection()
 
-	c.Client.Del(context.Background(), keys...).Result()
+	i, err := c.Client.Del(context.Background(), keys...).Result()
 
-	return true, nil
+	if err != nil {
+		return 0, errors.New("Cannot increase key. Error detail: " + err.Error())
+	}
+
+	return i, nil
 }
