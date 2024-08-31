@@ -8,7 +8,7 @@ import (
 )
 
 func Set(key string, value any, ttl time.Duration) error {
-	c := GetConnection() //TODO: this is singleton connection
+	c := GetConnection() //NOTE: this is singleton connection
 
 	valueByte, err := json.Marshal(value)
 
@@ -22,7 +22,7 @@ func Set(key string, value any, ttl time.Duration) error {
 }
 
 func Get(key string, record any) error {
-	c := GetConnection() //TODO: this is singleton connection
+	c := GetConnection() //NOTE: this is singleton connection
 
 	b, err := c.Client.Get(context.Background(), key).Result()
 

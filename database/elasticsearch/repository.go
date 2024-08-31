@@ -142,6 +142,7 @@ func GetOneDocument(indexKey string, query *search.Request) *common.APIResponse 
 	res, err := es.Client.Search().Index(indexKey).Request(query).Do(context.Background())
 
 	if err != nil {
+
 		return &common.APIResponse{
 			Total:   0,
 			Message: "Error query one in index " + indexKey + ". Error detail: " + err.Error(),
@@ -154,4 +155,5 @@ func GetOneDocument(indexKey string, query *search.Request) *common.APIResponse 
 		Message: "Query one in index " + indexKey + "successfully.",
 		Data:    res,
 		Status:  common.APIStatus.Ok,
-	}}
+	}
+}

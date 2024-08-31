@@ -9,11 +9,11 @@ var JWT_PAYLOAD = "JWT_PAYLOAD"
 
 // APIResponse This is  response object with JSON format
 type APIResponse struct {
-	Status  int32             `json:"status"`
-	Data    interface{}       `json:"data,omitempty"`
-	Message string            `json:"message"`
-	Total   int64             `json:"total,omitempty"`
-	Headers map[string]string `json:"headers,omitempty"`
+	StatusCode int32             `json:"statusCode"`
+	Data       interface{}       `json:"data,omitempty"`
+	Message    string            `json:"message"`
+	Total      int64             `json:"total,omitempty"`
+	Headers    map[string]string `json:"headers,omitempty"`
 }
 
 type JWTPayload struct {

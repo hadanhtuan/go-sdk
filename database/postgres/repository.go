@@ -199,8 +199,8 @@ func (m *Instance) Query(query *gorm.DB, offset int32, limit int32, option *Quer
 	}
 
 	err := query.Count(&total). // count
-					Offset(int((offset - 1) * limit)).Limit(int(limit)). // paginate
-					Where(query).Find(entities).Error
+		Offset(int((offset - 1) * limit)).Limit(int(limit)). // paginate
+		Where(query).Find(entities).Error
 
 	if err != nil {
 		return &common.APIResponse{

@@ -13,7 +13,7 @@ type App struct {
 }
 
 // App func run cronjob, start grpc server, http server
-func (app *App) Start() error {
+func (app *App) Start() {
 	var wg = sync.WaitGroup{}
 
 	// start GRPC servers
@@ -43,6 +43,4 @@ func (app *App) Start() error {
 		fmt.Println("[ 🚀 ] Cronjobs started.")
 	}
 	wg.Wait()
-
-	return nil
 }

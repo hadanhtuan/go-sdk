@@ -3,9 +3,9 @@ package es
 import (
 	"context"
 	"fmt"
+	"github.com/elastic/go-elasticsearch/v8"
 	"log/slog"
 	"time"
-	"github.com/elastic/go-elasticsearch/v8"
 )
 
 type ESClient struct {

@@ -2,15 +2,15 @@ package aws
 
 import (
 	"context"
-	"time"
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/hadanhtuan/go-sdk"
 	"github.com/hadanhtuan/go-sdk/common"
 	"github.com/matelang/jwt-go-aws-kms/v2/jwtkms"
+	"time"
 )
 
-// TODO: don't need to provide access key, when deploy to EC2 need to associate role
+// NOTE: don't need to provide access key, when deploy to EC2 need to associate role
 func NewJWT(payload *common.JWTPayload) (*common.JWTToken, error) {
 	AWS := GetConnection()
 

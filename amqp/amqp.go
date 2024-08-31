@@ -3,12 +3,12 @@ package amqp
 import (
 	"context"
 	"fmt"
+	"github.com/spf13/viper"
+	"github.com/streadway/amqp"
 	"log"
 	"log/slog"
 	"sync"
 	"time"
-	"github.com/spf13/viper"
-	"github.com/streadway/amqp"
 )
 
 type CallbackFunc func([]byte)
